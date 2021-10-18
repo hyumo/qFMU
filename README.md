@@ -1,9 +1,9 @@
 
 # qFMU
 
-`qFMU` can **q**uickly generate a simple **FMU** through cli. Currently, `qFMU` supports:
+`qFMU` can **q**uickly export a system that is described in classical forms as an **FMU** through CLI, for example:
 
-- An LTI System in state space (A,B,C,D matrix) format.
+- An LTI system in state space (A,B,C,D matrix) form.
 
 ## Usage
 

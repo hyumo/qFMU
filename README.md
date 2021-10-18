@@ -1,9 +1,9 @@
 
 # qFMU
 
-**Q**uickly generate a simple **FMU**. Currently, `qFMU` can generate an FMU that describes:
+`qFMU` can **q**uickly generates a simple **FMU** through cli. Currently, `qFMU` can generate an FMU that describes:
 
-- An LTI System defined using state space (A,B,C,D matrix) format.
+- An LTI System in state space (A,B,C,D matrix) format.
 
 ## Usage
 

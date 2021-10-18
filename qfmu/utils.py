@@ -23,8 +23,3 @@ def convert_from_string(data):
         count += 1
         newdata.append(newrow)
     return newdata
-
-
-def to_ndarray(data):
-    if isinstance(data, str):
-        return 

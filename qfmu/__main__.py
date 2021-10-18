@@ -22,5 +22,3 @@ tf.add_argument("-d", default="1", type=str, help="Denominator")
 # print(parser.parse_args(['ss', '-h']))
 args = parser.parse_args(['ss', '-a', '1,2;3,4'])
 print(args)
-
-

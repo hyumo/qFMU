@@ -2,13 +2,16 @@ import numpy as np
 from numpy.core.fromnumeric import shape
 from .utils import convert_from_string
 
+class TransferFunction:
+    pass
+
 class StateSpace:
     '''
     State Space Models
 
     A, B, C,D should be 2d numpy arrays or strings "1,2,3;4,5,6"
     '''
-    def __init__(self, A=None, B=None, C=None, D=None) -> None:
+    def __init__(self, A=None, B=None, C=None, D=None, x0=None, u0=None) -> None:
         
         if all(m is None for m in [A, B, C, D]):
             raise ValueError("A, B, C, D cannot be all empty")
@@ -21,12 +24,18 @@ class StateSpace:
             C = convert_from_string(C)
         if isinstance(D, str):
             D = convert_from_string(D)
+        if isinstance(x0, str):
+            x0 = convert_from_string(x0)
+        if isinstance(u0, str):
+            u0 = convert_from_string(u0)
 
         self.A = None if A is None else np.array(A, dtype=float)
         self.B = None if B is None else np.array(B, dtype=float)
         self.C = None if C is None else np.array(C, dtype=float)
         self.D = None if D is None else np.array(D, dtype=float)
-
+        self.x0 = None if x0 is None else np.array(x0, dtype=float)
+        self.u0 = None if u0 is None else np.array(u0, dtype=float)
+        
         # Create A if it is None
         if self.A is None:
             self.A = np.zeros((0, 0))
@@ -73,6 +82,16 @@ class StateSpace:
             raise ValueError("size mismatch. B must have the same number of columns as D")
         
         self.nu = self.B.shape[1]
-                
-    def toFMI2(self, x0, u0, identifier: str="foo", version: str="v0.1"):
-        print("not implemented")
+
+        if self.x0 is None and self.nx > 0:
+            self.x0 = np.zeros(self.nx, dtype=float)
+        if self.x0 is not None:
+            if self.nx != self.x0.size:
+                raise ValueError("size mismatch. len(x0) != number of states")
+        
+        if self.u0 is None and self.nu > 0:
+            self.u0 = np.zeros(self.nu, dtype=float)
+        if self.u0 is not None:
+            if self.nu != self.u0.size:
+                raise ValueError("size mismatch. len(u0) != number of inputs")
+        

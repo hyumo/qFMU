@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  fmiVersion="2.0"
+  modelName="fmi2model"
+  guid="a59da1b2-307c-11ec-8714-00155d4fc7dc"
+  version="v0.0"
+  generationTool="qfmu"
+  generationDateAndTime="2021-10-18 21:34:05.429238"
+  numberOfEventIndicators="0">
+
+  <ModelExchange
+    modelIdentifier="fmi2model"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false"
+    providesDirectionalDerivative="false">
+    <SourceFiles>
+      <File
+        name="lti.c"/>
+    </SourceFiles>
+  </ModelExchange>
+  
+  <CoSimulation
+    modelIdentifier="fmi2model"
+    canHandleVariableCommunicationStepSize="false"
+    canInterpolateInputs="false"
+    maxOutputDerivativeOrder="1"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false"
+    providesDirectionalDerivative="false">
+    <SourceFiles>
+      <File
+        name="lti.c"/>
+    </SourceFiles>
+  </CoSimulation>
+
+  <DefaultExperiment startTime="0.0"
+    stopTime="1.0"
+    tolerance="0.0001"/>
+  
+  <LogCategories>
+    <Category name="logAll"/>
+    <Category name="logError"/>
+    <Category name="logFmiCall"/>
+    <Category name="logEvent"/>
+  </LogCategories>
+
+  <ModelVariables>
+    <ScalarVariable name="x0" valueReference="0" description="Continuous state 0">
+      <Real/>
+    </ScalarVariable>
+    <ScalarVariable name="x1" valueReference="1" description="Continuous state 1">
+      <Real/>
+    </ScalarVariable>
+    <ScalarVariable name="der_x0" valueReference="2" description="State derivative 0">
+      <Real derivative="1"/>
+    </ScalarVariable>
+    <ScalarVariable name="der_x1" valueReference="3" description="State derivative 1">
+      <Real derivative="2"/>
+    </ScalarVariable>
+    <ScalarVariable name="y0" valueReference="4" description="Model output 0" causality="output">
+      <Real/>
+    </ScalarVariable>
+    <ScalarVariable name="y1" valueReference="5" description="Model output 1" causality="output">
+      <Real/>
+    </ScalarVariable>
+    <ScalarVariable name="x0_start" valueReference="6" description="Start value for x0" causality="parameter" variability="fixed">
+      <Real start="0.0"/>
+    </ScalarVariable>
+    <ScalarVariable name="x1_start" valueReference="7" description="Start value for x1" causality="parameter" variability="fixed">
+      <Real start="0.0"/>
+    </ScalarVariable>
+  </ModelVariables>
+  
+  <ModelStructure>
+    <Outputs>
+      <Unknown index="5" />
+      <Unknown index="6" />
+    </Outputs>
+    <Derivatives>
+      <Unknown index="3" />
+      <Unknown index="4" />
+    </Derivatives>
+  </ModelStructure>
+</fmiModelDescription>

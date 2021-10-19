@@ -1,17 +1,15 @@
 import os
-
 from dataclasses import dataclass, field
 from typing import List
 import uuid
 import datetime
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2.environment import Template
 
-from ..lti import StateSpace, TransferFunction
+from ..models.lti import StateSpace, TransferFunction
 
-DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(DIR, "templates", "fmi2")
-FMI2ENV = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=select_autoescape())
-
+#DIR = os.path.dirname(os.path.abspath(__file__))
+#TEMPLATE_DIR = os.path.join(DIR, "templates", "fmi2")
+#FMI2ENV = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=select_autoescape())
 
 class Fmi2:
     def __init__(self, identifier: str = "fmi2model", version: str = "v0.0") -> None:
@@ -85,18 +83,80 @@ class Lti(Fmi2):
         )
 
     def render_c(self):
-        tmpl = FMI2ENV.get_template('lti.cpp.j2')
+        from .fmi2tmpl import lti_c_tmpl
+        tmpl = Template(lti_c_tmpl)
         return tmpl.render(self.__dict__)
 
     def render_xml(self):
-        tmpl = FMI2ENV.get_template('lti.modelDescription.xml.j2')
+        from .fmi2tmpl import lti_md_xml_tmpl
+        tmpl = Template(lti_md_xml_tmpl)
         return tmpl.render(self.__dict__)
+
+    def render_doc(self):
+        return r"## qFMU model"
+
+def generate_code(model, fmudir: str = None):
+    """Create an unzipped fmuoutput folder structure that represents an fmu
+
+    Args:
+        model ([type]): [description]
+        fmudir (str, optional): [description]. Defaults to None.
+
+    Raises:
+        ValueError: [description]
+    """
+    if not os.path.isdir(fmudir):
+        raise ValueError("Target path does not exist. {}".format(fmudir))
+
+    root = fmudir
+    binaries = os.mkdir(os.path.join(fmudir, "binaries"))
+    sources = os.mkdir(os.path.join(fmudir, "sources"))
+    documentation = os.mkdir(os.path.join(fmudir, "documentation"))
+
+    with open(os.path.join(sources, "fmi2model.c"), "w") as file:
+        file.write(model.render_c())
+    with open(os.path.join(root, "modelDescripion.xml"), "w") as file:
+        file.write(model.render_xml())
+    with open(os.path.join(documentation, "README.md"), "w") as file:
+        file.write(model.render_doc())
+    
+    from .fmi2src import fmi2Template_h, fmi2Template_c, fmi2TypesPlatform_h, fmi2FunctionTypes_h, fmi2Functions_h
+    with open(os.path.join(sources, "fmi2Template.h"), "w") as file:
+        file.write(fmi2Template_h)
+    with open(os.path.join(sources, "fmi2Template.c"), "w") as file:
+        file.write(fmi2Template_c)
+    with open(os.path.join(sources, "fmi2Functions.h"), "w") as file:
+        file.write(fmi2Functions_h)
+    with open(os.path.join(sources, "fmi2FunctionTypes.h"), "w") as file:
+        file.write(fmi2FunctionTypes_h)
+    with open(os.path.join(sources, "fmi2TypesPlatform.h"), "w") as file:
+        file.write(fmi2TypesPlatform_h)
+
+def compile_dll(fmudir: str = None, compiler=None, target_platform=None):
+    if not os.path.isdir(os.path.join(fmudir, "sources")):
+        raise ValueError("Sources path does not exist. Please generate source code.")
+        
+    
+
+
 
 
 if __name__ == "__main__":
-    s = Lti(StateSpace(A="1,2;3,4"))
-    print(s.__dict__)
-    with open("/home/hyu/sw/qFMU/tmp/lti.c", "w") as file:
+    from .fmi2src import fmi2Template_h, fmi2Template_c, fmi2Functions_h, fmi2FunctionTypes_h, fmi2TypesPlatform_h
+
+    s = Lti(StateSpace(A="1,2;3,4"), identifier="fooooooo")
+    with open("/home/hyu/sw/qFMU/tmp/fmi2model.c", "w") as file:
         file.write(s.render_c())
     with open("/home/hyu/sw/qFMU/tmp/modelDescripion.xml", "w") as file:
         file.write(s.render_xml())
+
+    with open("/home/hyu/sw/qFMU/tmp/fmi2Template.h", "w") as file:
+        file.write(fmi2Template_h)
+    with open("/home/hyu/sw/qFMU/tmp/fmi2Template.c", "w") as file:
+        file.write(fmi2Template_c)
+    with open("/home/hyu/sw/qFMU/tmp/fmi2Functions.h", "w") as file:
+        file.write(fmi2Functions_h)
+    with open("/home/hyu/sw/qFMU/tmp/fmi2FunctionTypes.h", "w") as file:
+        file.write(fmi2FunctionTypes_h)
+    with open("/home/hyu/sw/qFMU/tmp/fmi2TypesPlatform.h", "w") as file:
+        file.write(fmi2TypesPlatform_h)

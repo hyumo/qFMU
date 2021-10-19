@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+lti_c_tmpl = r'''///////////////////////////////////////////////////////////////////////////////
 // 
 //  PLEASE DO NOT MODIFY
 // 
@@ -169,6 +169,7 @@ static fmi2Real innerProduct(const fmi2Real *v1, const fmi2Real *v2, const size_
     return ret;
 }
 
+{%- if nx > 0 %}
 /**
  *  \brief Update derivative values
  */
@@ -182,7 +183,8 @@ static void updateDerivatives(ModelInstance* comp){
 {%- endif %}
     }
 }
-
+{%- endif %}
+{%- if nx > 0 %}
 /**
  *  \brief Update states values using numerical integration
  *  \todo TODO: Implement other integration methods
@@ -196,7 +198,8 @@ static void updateStates(ModelInstance* comp, fmi2Real h){
         comp->r[x_i] += h * comp->r[der_i];
     }
 }
-
+{%- endif %}
+{%- if ny > 0 %}
 /**
  * \brief Update output values based on current state
  */
@@ -213,7 +216,8 @@ static void updateOutputs(ModelInstance* comp) {
 {%- endif %}
     }
 }
-
+{%- endif %}
+{%- if nx > 0 %}
 /**
  * \brief Set state initial conditions
  */
@@ -227,7 +231,8 @@ static void setX0(ModelInstance* comp) {
 static void resetX0(ModelInstance* comp){
     memcpy(_X0, x0_reset, NX*sizeof(fmi2Real));
 }
-
+{%- endif %}
+{%- if nu > 0 %}
 /**
  * \brief Set initial input
  */
@@ -241,7 +246,7 @@ static void setU0(ModelInstance* comp) {
 static void resetU0(ModelInstance* comp) {
     memcpy(_U0, u0_reset, NU*sizeof(fmi2Real));
 }
-
+{%- endif %}
 /**
  * \brief Update all real values
  */
@@ -277,3 +282,99 @@ static void resetAll(ModelInstance* comp) {
 #ifdef __cplusplus
 }
 #endif
+'''
+
+lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  fmiVersion="2.0"
+  modelName="{{identifier}}"
+  guid="{{guid}}"
+  version="{{version}}"
+  generationTool="qfmu"
+  generationDateAndTime="{{datetime}}"
+  numberOfEventIndicators="0">
+
+  <ModelExchange
+    modelIdentifier="{{identifier}}"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false"
+    providesDirectionalDerivative="false">
+    <SourceFiles>
+      <File
+        name="fmi2model.c"/>
+    </SourceFiles>
+  </ModelExchange>
+  
+  <CoSimulation
+    modelIdentifier="{{identifier}}"
+    canHandleVariableCommunicationStepSize="false"
+    canInterpolateInputs="false"
+    maxOutputDerivativeOrder="1"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false"
+    providesDirectionalDerivative="false">
+    <SourceFiles>
+      <File
+        name="fmi2model.c"/>
+    </SourceFiles>
+  </CoSimulation>
+
+  <DefaultExperiment startTime="0.0"
+    stopTime="1.0"
+    tolerance="0.0001"/>
+  
+  <LogCategories>
+    <Category name="logAll"/>
+    <Category name="logError"/>
+    <Category name="logFmiCall"/>
+    <Category name="logEvent"/>
+  </LogCategories>
+
+  <ModelVariables>
+    {%- for i in range(nx) %}
+    <ScalarVariable name="x{{i}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i}}">
+      <Real/>
+    </ScalarVariable>
+    {%- endfor %}
+    {%- for i in range(nx) %}
+    <ScalarVariable name="der_x{{i}}" valueReference="{{vrs.der[i]}}" description="State derivative {{i}}">
+      <Real derivative="{{ vrs.x[i] | int + 1 }}"/>
+    </ScalarVariable>
+    {%- endfor %}
+    {%- for i in range(nu) %}
+    <ScalarVariable name="u{{i}}" valueReference="{{vrs.u[i]}}" description="Model input {{i}}" causality="input">
+      <Real/>
+    </ScalarVariable>
+    {%- endfor %}
+    {%- for i in range(ny) %}
+    <ScalarVariable name="y{{i}}" valueReference="{{vrs.y[i]}}" description="Model output {{i}}" causality="output">
+      <Real/>
+    </ScalarVariable>
+    {%- endfor %}
+    {%- for i in range(nx) %}
+    <ScalarVariable name="x{{i}}_start" valueReference="{{vrs.x0[i]}}" description="Start value for x{{i}}" causality="parameter" variability="fixed">
+      <Real start="{{x0[i]}}"/>
+    </ScalarVariable>
+    {%- endfor %}
+    {%- for i in range(nu) %}
+    <ScalarVariable name="u{{i}}_start" valueReference="{{vrs.u0[i]}}" description="Start value for u{{i}}" causality="parameter" variability="fixed">
+      <Real start="{{u0[i]}}"/>
+    </ScalarVariable>
+    {%- endfor %}
+  </ModelVariables>
+  
+  <ModelStructure>
+    <Outputs>
+    {%- for i in range(ny) %}
+      <Unknown index="{{vr0.y + i + 1}}" />
+    {%- endfor %}
+    </Outputs>
+    <Derivatives>
+    {%- for i in range(nx) %}
+      <Unknown index="{{vr0.der + i + 1}}" />
+    {%- endfor %}
+    </Derivatives>
+  </ModelStructure>
+</fmiModelDescription>
+'''

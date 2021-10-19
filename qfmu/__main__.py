@@ -36,9 +36,9 @@ if args.dir is None:
 
 if os.path.isdir(args.dir):
     tmpdir = os.path.join(args.dir, "tmp")
-    if os.path.isdir(tmppath):
-        os.removedirs(tmppath)
-    os.mkdir(tmppath)
+    if os.path.isdir(tmpdir):
+        os.removedirs(tmpdir)
+    os.mkdir(tmpdir)
 else:
     logging.error("Target fmupath does not exist.")
     

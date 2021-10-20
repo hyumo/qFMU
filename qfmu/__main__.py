@@ -24,9 +24,9 @@ ss.add_argument("-D", required=False, type=str, help="D matrix")
 ss.add_argument("-x0", required=False, type=str, help="Init state values, zero vector if empty")
 ss.add_argument("-u0", required=False, type=str, help="Init input values, zero vector if empty")
 
-# tf = subparsers.add_parser("tf", help="Transfer function (not supported)")
-# tf.add_argument("-n", default="1,0", type=str, help="Numerator")
-# tf.add_argument("-d", default="1", type=str, help="Denominator")
+tf = subparsers.add_parser("tf", help="Transfer function (WIP)")
+tf.add_argument("-n", default="1,0", type=str, help="Numerator")
+tf.add_argument("-d", default="1", type=str, help="Denominator")
 
 
 args = parser.parse_args()

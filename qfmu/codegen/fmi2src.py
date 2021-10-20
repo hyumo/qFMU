@@ -175,8 +175,15 @@ fmi2Component fmi2Instantiate(fmi2String instanceName, fmi2Type fmuType, fmi2Str
     comp->loggingOn = loggingOn;
     comp->state = modelInstantiated;
 
-    resetAll(comp);
-    updateAll(comp);
+    // Reset x to x0, u to u0
+#if NX > 0
+    resetX(comp);
+    updateDerivatives(comp);
+#endif
+#if NU > 0
+    resetU(comp);
+    updateOutputs(comp);
+#endif     
 
     // Log func call
     FILTERED_LOG(comp, fmi2OK, LOG_FMI_CALL, "fmi2Instantiate: GUID=%s", fmuGUID)
@@ -216,7 +223,18 @@ fmi2Status fmi2ExitInitializationMode(fmi2Component c) {
     // if values were set and no fmi2GetXXX triggered update before,
     // ensure calculated values are updated now
     if (comp->isDirtyValues) {
-        updateAll(comp);
+#if NX > 0
+        copyX0toX(comp);
+#endif
+#if NU > 0
+        copyU0toU(comp);
+#endif
+#if NX > 0
+        updateDerivatives(comp);
+#endif
+#if NY > 0
+        updateOutputs(comp);
+#endif
         comp->isDirtyValues = fmi2False;
     }
 
@@ -245,7 +263,12 @@ fmi2Status fmi2Reset(fmi2Component c) {
     FILTERED_LOG(comp, fmi2OK, LOG_FMI_CALL, "fmi2Reset")
 
     comp->state = modelInstantiated;
-    resetAll(comp); // to be implemented by the includer of this file
+#if NX > 0
+    resetX(comp);
+#endif
+#if NU > 0
+    resetU(comp);
+#endif
     comp->isDirtyValues = fmi2True; // because we just called setStartValues
     return fmi2OK;
 }
@@ -328,7 +351,7 @@ fmi2Status fmi2GetReal(fmi2Component c, const fmi2ValueReference vr[], size_t nv
         return fmi2Error;
 
     if (nvr > 0 && comp->isDirtyValues) {
-        updateAll(comp);
+        evaluate(comp);
         comp->isDirtyValues = fmi2False;
     }
 
@@ -539,10 +562,10 @@ fmi2Status fmi2DoStep(fmi2Component c, fmi2Real currentCommunicationPoint,
                     fmi2Real communicationStepSize, fmi2Boolean noSetFMUStatePriorToCurrentPoint) {
     ModelInstance *comp = (ModelInstance *)c;
     // TODO: Find btter stepsize by looking at the eigen value!
-    double h = communicationStepSize / 10;
     int k;
-    const int n = 10; // how many Euler steps to perform for one do step
-    
+    const int n = 100; // how many Euler steps to perform for one do step
+    double h = communicationStepSize / n;
+
     if (isInvalidState(comp, "fmi2DoStep", MASK_fmi2DoStep))
         return fmi2Error;
 
@@ -710,6 +733,9 @@ fmi2Status fmi2SetContinuousStates(fmi2Component c, const fmi2Real x[], size_t n
         assert(vr < NR);
         comp->r[vr] = x[i];
     }
+#endif
+#if NY > 0
+    updateOutputs(comp);
 #endif
     return fmi2OK;
 }

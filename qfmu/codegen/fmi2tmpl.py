@@ -193,7 +193,7 @@ static void updateStates(ModelInstance* comp, fmi2Real h){
     size_t i = 0;
     for (i = 0; i < NX; i++) {
         fmi2ValueReference x_i = vrs_x[i];
-        fmi2ValueReference der_i = vrs_y[i];
+        fmi2ValueReference der_i = vrs_der[i];
         // Update states using forward Euler
         comp->r[x_i] += h * comp->r[der_i];
     }
@@ -218,45 +218,32 @@ static void updateOutputs(ModelInstance* comp) {
 }
 {%- endif %}
 {%- if nx > 0 %}
-/**
- * \brief Set state initial conditions
- */
-static void setX0(ModelInstance* comp) {
+static void copyX0toX(ModelInstance* comp){
     memcpy(_X, _X0, NX*sizeof(fmi2Real));
 }
-
 /**
  * \brief ReSet state initial conditions to original values
  */
-static void resetX0(ModelInstance* comp){
+static void resetX(ModelInstance* comp){
     memcpy(_X0, x0_reset, NX*sizeof(fmi2Real));
+    copyX0toX(comp);
 }
 {%- endif %}
 {%- if nu > 0 %}
-/**
- * \brief Set initial input
- */
-static void setU0(ModelInstance* comp) {
+static void copyU0toU(ModelInstance* comp) {
     memcpy(_U, _U0, NU*sizeof(fmi2Real));
 }
-
 /**
  * \brief ReSet input initial conditions to original values
  */
-static void resetU0(ModelInstance* comp) {
+static void resetU(ModelInstance* comp) {
     memcpy(_U0, u0_reset, NU*sizeof(fmi2Real));
+    copyU0toU(comp);
 }
 {%- endif %}
-/**
- * \brief Update all real values
- */
-static void updateAll(ModelInstance* comp) {
-{%- if nx > 0 %}
-    setX0(comp);
-{%- endif %}
-{%- if nu > 0 %}
-    setU0(comp);
-{%- endif %}
+
+
+static void evaluate(ModelInstance* comp){
 {%- if nx > 0 %}
     updateDerivatives(comp);
 {%- endif %}
@@ -265,17 +252,6 @@ static void updateAll(ModelInstance* comp) {
 {%- endif %}
 }
 
-/**
- * \brief Reset all parameters i.e. x0, u0
- */
-static void resetAll(ModelInstance* comp) {
-{%- if nx > 0 %}
-    resetX0(comp);
-{%- endif %}
-{%- if nu > 0 %}
-    resetU0(comp);
-{%- endif %}
-}
 
 #include "fmi2Template.c"
 
@@ -305,20 +281,8 @@ lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
         name="fmi2model.c"/>
     </SourceFiles>
   </ModelExchange>
-  
-  <CoSimulation
-    modelIdentifier="{{identifier}}"
-    canHandleVariableCommunicationStepSize="false"
-    canInterpolateInputs="false"
-    maxOutputDerivativeOrder="1"
-    canGetAndSetFMUstate="false"
-    canSerializeFMUstate="false"
-    providesDirectionalDerivative="false">
-    <SourceFiles>
-      <File
-        name="fmi2model.c"/>
-    </SourceFiles>
-  </CoSimulation>
+
+
 
   <DefaultExperiment startTime="0.0"
     stopTime="1.0"

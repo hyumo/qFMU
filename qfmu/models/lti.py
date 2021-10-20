@@ -25,9 +25,13 @@ class StateSpace:
         if isinstance(D, str):
             D = convert_from_string(D)
         if isinstance(x0, str):
-            x0 = convert_from_string(x0)
+            if ";" in x0:
+                raise ValueError("x0 should be a vector separated by comma or a single scalar, e.g. 1,2,3")
+            x0 = list(map(float, x0.split(",")))
         if isinstance(u0, str):
-            u0 = convert_from_string(u0)
+            if ";" in u0:
+                raise ValueError("u0 should be a vector separated by comma or a single scalar, e.g. 1,2,3")
+            u0 = list(map(float, u0.split(",")))
 
         self.A = None if A is None else np.array(A, dtype=float)
         self.B = None if B is None else np.array(B, dtype=float)

@@ -1,4 +1,5 @@
 import os
+import shutil
 from dataclasses import dataclass, field
 from typing import List
 import uuid
@@ -6,6 +7,7 @@ import datetime
 from jinja2.environment import Template
 
 from models.lti import StateSpace, TransferFunction
+from .utils import fmi_platform
 
 #DIR = os.path.dirname(os.path.abspath(__file__))
 #TEMPLATE_DIR = os.path.join(DIR, "templates", "fmi2")
@@ -94,7 +96,57 @@ class Lti(Fmi2):
     def render_doc(self):
         return r"## qFMU model"
 
-    def generate_code(self, fmudir: str = None):
+    def buildFMU(self, fmudir: str=None):
+        if not os.path.isdir(fmudir):
+            raise ValueError("Target path does not exist. {}".format(fmudir))
+
+        tmpdir = os.path.join(fmudir, "tmp")
+        if os.path.isdir(tmpdir):
+            shutil.rmtree(tmpdir)
+        os.mkdir(tmpdir)
+        
+        # Create folder structure
+        root_dir = tmpdir
+        bin_dir = os.path.join(tmpdir, "binaries")
+        platform_dir = os.path.join(bin_dir, fmi_platform())
+        src_dir = os.path.join(tmpdir, "sources")
+        doc_dir = os.path.join(tmpdir, "documentation")
+        os.mkdir(bin_dir)
+        os.mkdir(platform_dir)
+        os.mkdir(src_dir)
+        os.mkdir(doc_dir)
+
+        # Generate code
+        self.generate_code(src_dir)
+        self.generate_xml(root_dir)
+        self.generate_doc(doc_dir)
+
+        # Compile code
+        dllpath = self.compile_dll(src_dir)
+
+        # Move  to root
+        shutil.move(dllpath, os.path.join(platform_dir, os.path.basename(dllpath)))
+
+        # Zip files
+        zippath = shutil.make_archive(os.path.join(fmudir, self.identifier), 'zip', tmpdir)
+
+        # Rename fmu to have *.fmu
+        shutil.move(zippath, os.path.join(fmudir, self.identifier+".fmu"))
+
+
+    def generate_xml(self, dir: str):
+        if not os.path.isdir(dir):
+            raise ValueError("Target path does not exist. {}".format(dir))
+        with open(os.path.join(dir, "modelDescription.xml"), "w") as file:
+            file.write(self.render_xml())
+    
+    def generate_doc(self, dir: str):
+        if not os.path.isdir(dir):
+            raise ValueError("Target path does not exist. {}".format(dir))
+        with open(os.path.join(dir, "README.md"), "w") as file:
+            file.write(self.render_doc())
+
+    def generate_code(self, dir: str):
         """Create an unzipped fmuoutput folder structure that represents an fmu
 
         Args:
@@ -103,67 +155,68 @@ class Lti(Fmi2):
         Raises:
             ValueError: [description]
         """
-        if not os.path.isdir(fmudir):
-            raise ValueError("Target path does not exist. {}".format(fmudir))
+        if not os.path.isdir(dir):
+            raise ValueError("Target path does not exist. {}".format(dir))
 
-        root_dir = fmudir
-        bin_dir = os.path.join(fmudir, "binaries")
-        src_dir = os.path.join(fmudir, "sources")
-        doc_dir = os.path.join(fmudir, "documentation")
-        os.mkdir(bin_dir)
-        os.mkdir(src_dir)
-        os.mkdir(doc_dir)
-
-        with open(os.path.join(src_dir, "fmi2model.c"), "w") as file:
+        with open(os.path.join(dir, "fmi2model.c"), "w") as file:
             file.write(self.render_c())
-        with open(os.path.join(root_dir, "modelDescripion.xml"), "w") as file:
-            file.write(self.render_xml())
-        with open(os.path.join(doc_dir, "README.md"), "w") as file:
-            file.write(self.render_doc())
-        
         from .fmi2src import fmi2Template_h, fmi2Template_c, fmi2TypesPlatform_h, fmi2FunctionTypes_h, fmi2Functions_h
-        with open(os.path.join(src_dir, "fmi2Template.h"), "w") as file:
+        with open(os.path.join(dir, "fmi2Template.h"), "w") as file:
             file.write(fmi2Template_h)
-        with open(os.path.join(src_dir, "fmi2Template.c"), "w") as file:
+        with open(os.path.join(dir, "fmi2Template.c"), "w") as file:
             file.write(fmi2Template_c)
-        with open(os.path.join(src_dir, "fmi2Functions.h"), "w") as file:
+        with open(os.path.join(dir, "fmi2Functions.h"), "w") as file:
             file.write(fmi2Functions_h)
-        with open(os.path.join(src_dir, "fmi2FunctionTypes.h"), "w") as file:
+        with open(os.path.join(dir, "fmi2FunctionTypes.h"), "w") as file:
             file.write(fmi2FunctionTypes_h)
-        with open(os.path.join(src_dir, "fmi2TypesPlatform.h"), "w") as file:
+        with open(os.path.join(dir, "fmi2TypesPlatform.h"), "w") as file:
             file.write(fmi2TypesPlatform_h)
 
-    def compile_dll(self, fmudir: str = None, compiler=None, target_platform=None):
+    def compile_dll(self, src_dir: str = None, compiler=None):
         # ref: https://github.com/CATIA-Systems/FMPy/blob/47760e9e4c4f435c43e8c14cdd8e12fccf6f7028/fmpy/util.py#L727
-        sources_dir = os.path.join(fmudir, "sources")
-        if not os.path.isdir(sources_dir):
+        if not os.path.isdir(src_dir):
             raise ValueError("Sources path does not exist. Please generate source code.")
-            
-        if compiler is None:
-            # TODO: Switch to vc if platform is windows
-            compiler = 'gcc'
         
-        if compiler == 'gcc':
-            cc = 'gcc'
-            target = self.identifier + ".so"
-            cmd = f'{cc} -c -I. -fPIC fmi2model.c'
-            cmd += f' && {cc} -static-libgcc -shared -o{target} *.o -lm'
+        platform = fmi_platform()
+        if compiler is None:
+            if 'win' in platform:
+                compiler = 'vc'
+            else:
+                compiler = 'gcc'
+        
+        if compiler == 'vc':
+            target = self.identifier + ".dll"
+            raise Exception("Not implemented yet")
+        elif compiler == 'gcc':
+            if 'linux' in platform:
+                target = self.identifier + ".so"
+                cmd = 'gcc -c -I. -fPIC -DDISABLE_PREFIX fmi2model.c '
+                cmd += f' && gcc -static-libgcc -shared -o{target} *.o -lm'
+            elif 'darwin' in platform:
+                target = self.identifier + ".dylib"
+                cmd = 'gcc -c -I. fmi2model.c'
+                cmd += f' && gcc -shared -o{target} *.o -lm'
+            else:
+                raise Exception("Unknown platform")
+        else:
+            raise Exception("Unknown compiler")
         
         wd = os.getcwd()
-        os.chdir(sources_dir)
+        os.chdir(src_dir)
         status = os.system(cmd)
         os.chdir(wd)
         
-        dll_path = os.path.join(sources_dir, target)
-
+        dll_path = os.path.join(src_dir, target)
         if status != 0 or not os.path.isfile(dll_path):
             raise Exception('Failed to compile shared library')
         
+        # Clean up
+        for item in os.listdir(src_dir):
+            if item.endswith(".o"):
+                os.remove(os.path.join(src_dir, item))
+
         return str(dll_path)
     
-
-
-
 
 
 if __name__ == "__main__":

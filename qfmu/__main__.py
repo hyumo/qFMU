@@ -37,7 +37,7 @@ if args.dir is None:
 if args.subcmd == "ss":
     try:
         m = Lti(StateSpace(args.A, args.B, args.C, args.D, args.x0, args.u0), identifier=args.name)
-        m.buildFMU("/home/hyu/sw/qFMU/fmuoutput")
+        m.buildFMU(args.dir)
 
     except ValueError as ex:
         sys.exit(ex)

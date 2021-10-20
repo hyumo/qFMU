@@ -34,10 +34,12 @@ args = parser.parse_args()
 if args.dir is None:
     args.dir = os.getcwd()
 
+import shutil
+
 if os.path.isdir(args.dir):
     tmpdir = os.path.join(args.dir, "tmp")
     if os.path.isdir(tmpdir):
-        os.removedirs(tmpdir)
+        shutil.rmtree(tmpdir)
     os.mkdir(tmpdir)
 else:
     logging.error("Target fmupath does not exist.")
@@ -45,9 +47,8 @@ else:
 if args.subcmd == "ss":
     try:
         m = Lti(StateSpace(args.A, args.B, args.C, args.D, args.x0, args.u0), identifier=args.name)
-        
-        
-        m.render_c()
+        m.generate_code('/home/hyu/sw/qFMU/tmp')
+        m.compile_dll('/home/hyu/sw/qFMU/tmp')
 
     except ValueError as ex:
         sys.exit(ex)

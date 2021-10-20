@@ -563,10 +563,10 @@ fmi2Status fmi2DoStep(fmi2Component c, fmi2Real currentCommunicationPoint,
     comp->time = currentCommunicationPoint;
     for (k = 0; k < n; k++) {
         comp->time += h;
-{% if nx > 0 %}
+#if NX > 0
         updateDerivatives(comp);
         updateStates(comp, h);
-{% endif %}
+#endif
     }
 
     // Update outputs based on new state values
@@ -703,14 +703,14 @@ fmi2Status fmi2SetContinuousStates(fmi2Component c, const fmi2Real x[], size_t n
         return fmi2Error;
     if (isNullPtr(comp, "fmi2SetContinuousStates", "x[]", x))
         return fmi2Error;
-{% if nx > 0 %}
+#if NX > 0
     for (i = 0; i < nx; i++) {
-        fmi2ValueReference vr = vrStates[i];
+        fmi2ValueReference vr = vrs_x[i];
         FILTERED_LOG(comp, fmi2OK, LOG_FMI_CALL, "fmi2SetContinuousStates: #r%d#=%.16g", vr, x[i])
         assert(vr < NR);
         comp->r[vr] = x[i];
     }
-{% endif %}
+#endif
     return fmi2OK;
 }
 
@@ -724,14 +724,14 @@ fmi2Status fmi2GetDerivatives(fmi2Component c, fmi2Real derivatives[], size_t nx
         return fmi2Error;
     if (isNullPtr(comp, "fmi2GetDerivatives", "derivatives[]", derivatives))
         return fmi2Error;
-{% if nx > 0 %}
+#if NX > 0
     updateDerivatives(comp);
     for (i = 0; i < NX; ++i){
-        fmi2ValueReference der_i = vrDers[i];
+        fmi2ValueReference der_i = vrs_der[i];
         derivatives[i] = comp->r[der_i];
         FILTERED_LOG(comp, fmi2OK, LOG_FMI_CALL, "fmi2GetDerivatives: #r%d# = %.16g", der_i, derivatives[i])
     }
-{% endif %}
+#endif
     return fmi2OK;
 }
 
@@ -756,7 +756,7 @@ fmi2Status fmi2GetContinuousStates(fmi2Component c, fmi2Real states[], size_t nx
         return fmi2Error;
 #if NX>0
     for (i = 0; i < nx; i++) {
-        fmi2ValueReference vr = vrStates[i];
+        fmi2ValueReference vr = vrs_x[i];
         states[i] = comp->r[vr]; // to be implemented by the includer of this file
         FILTERED_LOG(comp, fmi2OK, LOG_FMI_CALL, "fmi2GetContinuousStates: #r%u# = %.16g", vr, states[i])
     }

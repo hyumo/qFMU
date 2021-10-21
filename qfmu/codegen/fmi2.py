@@ -6,8 +6,8 @@ import uuid
 import datetime
 from jinja2.environment import Template
 
-from models.lti import StateSpace, TransferFunction
-from .utils import fmi_platform
+from qfmu.models.lti import StateSpace, TransferFunction
+from qfmu.codegen.utils import fmi_platform
 
 #DIR = os.path.dirname(os.path.abspath(__file__))
 #TEMPLATE_DIR = os.path.join(DIR, "templates", "fmi2")
@@ -129,7 +129,6 @@ class Lti(Fmi2):
 
         # Zip files
         zippath = shutil.make_archive(os.path.join(fmudir, self.identifier), 'zip', tmpdir)
-
         # Rename fmu to have *.fmu
         shutil.move(zippath, os.path.join(fmudir, self.identifier+".fmu"))
 

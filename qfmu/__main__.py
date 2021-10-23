@@ -10,13 +10,13 @@ logging.basicConfig(level=logging.INFO)
 
 def main():
     """Console script for qfmu."""
-    parser = argparse.ArgumentParser(description="Quick FMU")
+    parser = argparse.ArgumentParser(description="Generate standard form system FMUs through commandline")
     parser.add_argument("--name", default="qmodel", type=str, help="Target FMU identifier")
     parser.add_argument("--dir", default=os.getcwd(), type=str, help="Target FMU path")
 
-    subparsers = parser.add_subparsers(title="subcommands", dest="subcmd")
-    ss = subparsers.add_parser("ss", help="State space model, A, B, C, D",
-                            description="Define ABCD matrices using string. The string is interpreted as a matrix with commas or spaces separating columns, and semicolons separating rows (see `numpy.matrix`). e.g. '1 2; 3 4' -> 2x2 matrix")
+    subparsers = parser.add_subparsers(title="system forms", dest="subcmd")
+    ss = subparsers.add_parser("ss", help="State space model: A, B, C, D",
+                            description="Define ABCD matrices using string. The string is interpreted as a matrix with commas or spaces separating columns, and semicolons separating rows. e.g. '1,2;3,4' -> 2x2 matrix")
     ss.add_argument("-A", required=False, type=str, help="A matrix")
     ss.add_argument("-B", required=False, type=str, help="B matrix")
     ss.add_argument("-C", required=False, type=str, help="C matrix")
@@ -24,9 +24,9 @@ def main():
     ss.add_argument("-x0", required=False, type=str, help="Init state values, zero vector if empty")
     ss.add_argument("-u0", required=False, type=str, help="Init input values, zero vector if empty")
 
-    tf = subparsers.add_parser("tf", help="Transfer function (WIP)")
-    tf.add_argument("-n", default="1,0", type=str, help="Numerator")
-    tf.add_argument("-d", default="1", type=str, help="Denominator")
+    # tf = subparsers.add_parser("tf", help="Transfer function (WIP)")
+    # tf.add_argument("-n", default="1,0", type=str, help="Numerator")
+    # tf.add_argument("-d", default="1", type=str, help="Denominator")
 
     args = parser.parse_args()
 

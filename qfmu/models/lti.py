@@ -10,7 +10,7 @@ class StateSpace:
 
     A, B, C,D should be 2d numpy arrays or strings "1,2,3;4,5,6"
     '''
-    def __init__(self, A=None, B=None, C=None, D=None, x0=None, u0=None) -> None:
+    def __init__(self, A=None, B=None, C=None, D=None, x0=None) -> None:
         
         if all(m is None for m in [A, B, C, D]):
             raise ValueError("A, B, C, D cannot be all empty")
@@ -20,7 +20,6 @@ class StateSpace:
         self.C = None if C is None else np.array(C, dtype=float)
         self.D = None if D is None else np.array(D, dtype=float)
         self.x0 = None if x0 is None else np.array(x0, dtype=float)
-        self.u0 = None if u0 is None else np.array(u0, dtype=float)
         
         # Create A if it is None
         if self.A is None:
@@ -74,10 +73,4 @@ class StateSpace:
         if self.x0 is not None:
             if self.nx != self.x0.size:
                 raise ValueError("Invalid vector size. len(x0) != number of states")
-        
-        if self.u0 is None and self.nu > 0:
-            self.u0 = np.zeros(self.nu, dtype=float)
-        if self.u0 is not None:
-            if self.nu != self.u0.size:
-                raise ValueError("Invalid vector size. len(u0) != number of inputs")
         

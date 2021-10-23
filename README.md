@@ -9,16 +9,17 @@ Currently, `qfmu` supports:
 
 ## Installation
 
+Install `qfmu` through PyPI
+
+```
+pip install qfmu
+```
+
 *Noted* that a proper C compiler is required on your OS. 
 
 - `gcc` for Linux and Debian. 
 - `msvc` for windows (WIP).
 
-Installation through PyPI
-
-```
-pip install qfmu
-```
 ## HelloWorld
 
 Generate an LTI system in state space form using the following command: 

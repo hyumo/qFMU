@@ -7,7 +7,7 @@ import datetime
 from jinja2.environment import Template
 
 from qfmu.models.lti import StateSpace, TransferFunction
-from qfmu.codegen.utils import fmi_platform
+from qfmu.utils import fmi_platform
 
 #DIR = os.path.dirname(os.path.abspath(__file__))
 #TEMPLATE_DIR = os.path.join(DIR, "templates", "fmi2")

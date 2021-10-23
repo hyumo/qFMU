@@ -1,5 +1,5 @@
 import numpy as np
-from .utils import convert_from_string
+from qfmu.utils import str_to_1d_array, str_to_2d_array
 
 class TransferFunction:
     pass
@@ -16,21 +16,17 @@ class StateSpace:
             raise ValueError("A, B, C, D cannot be all empty")
         
         if isinstance(A, str):
-            A = convert_from_string(A)
+            A = str_to_2d_array(A)
         if isinstance(B, str):
-            B = convert_from_string(B)
+            B = str_to_2d_array(B)
         if isinstance(C, str):
-            C = convert_from_string(C)
+            C = str_to_2d_array(C)
         if isinstance(D, str):
-            D = convert_from_string(D)
+            D = str_to_2d_array(D)
         if isinstance(x0, str):
-            if ";" in x0:
-                raise ValueError("x0 should be a vector separated by comma or a single scalar, e.g. 1,2,3")
-            x0 = list(map(float, x0.split(",")))
+            x0 = str_to_1d_array(x0)
         if isinstance(u0, str):
-            if ";" in u0:
-                raise ValueError("u0 should be a vector separated by comma or a single scalar, e.g. 1,2,3")
-            u0 = list(map(float, u0.split(",")))
+            u0 = str_to_1d_array(u0)
 
         self.A = None if A is None else np.array(A, dtype=float)
         self.B = None if B is None else np.array(B, dtype=float)

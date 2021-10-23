@@ -32,7 +32,14 @@ def main():
 
     try:
         if args.subcmd == "ss":
-            m = Lti(StateSpace(args.A, args.B, args.C, args.D, args.x0, args.u0), identifier=args.name)
+            from qfmu.utils import str_to_1d_array, str_to_2d_array
+            A = None if args.A is None or args.A=="" else str_to_2d_array(args.A)
+            B = None if args.B is None or args.B=="" else str_to_2d_array(args.B)
+            C = None if args.C is None or args.C=="" else str_to_2d_array(args.C)
+            D = None if args.D is None or args.D=="" else str_to_2d_array(args.D)
+            x0 = None if args.x0 is None or args.x0=="" else str_to_1d_array(args.x0)
+            u0 = None if args.u0 is None or args.u0=="" else str_to_1d_array(args.u0)
+            m = Lti(StateSpace(A, B, C, D, x0, u0), identifier=args.name)
             m.buildFMU(args.dir)
         else:
             raise Exception("Unknown subcommand")

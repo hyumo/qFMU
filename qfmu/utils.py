@@ -30,8 +30,12 @@ def str_to_1d_array(data: str)->np.ndarray:
             return np.fromstring(data, dtype=float, sep=' ')
     elif data.count(';') == 1 and data.endswith(';'):
         return np.fromstring(data, dtype=float, sep=' ')
+    else:
+        raise ValueError("Invalid vector format.")
 
 def str_to_2d_array(data:str)->np.ndarray:
+    if ";" not in data:
+        raise ValueError("Invalid matrix format. Rows should be separated by ;")
     # Replace [] with empty
     for char in '[]':
         data = data.replace(char, '')
@@ -48,7 +52,7 @@ def str_to_2d_array(data:str)->np.ndarray:
         if count == 0:
             ncols = newrow.shape[0]
         elif newrow.shape[0] != ncols:
-            raise ValueError("Data should have the same number of values in a row.")
+            raise ValueError("Invalid matrix format. Each row should have the same number of values.")
         count += 1
         arr.append(newrow)
     return np.asarray(arr)

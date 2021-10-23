@@ -26,7 +26,7 @@ setup(
     description="description",
     entry_points={
         'console_scripts': [
-            'qfmu=qfmu.cli:main',
+            'qfmu=qfmu.__main__:main',
         ],
     },
     install_requires=requirements,

@@ -25,7 +25,7 @@ pip install qfmu
 Generate an LTI system in state space form using the following command: 
 
 ```
-qfmu --name helloWorld ss -A="1,2;3,4" -B="1;2" -C="1,0;0,1" -D="[0;0]"
+qfmu --name helloWorld ss -A="1,2;3,4" -B="1;2" -C="1,0;0,1" -D="0;0"
 ```
 
 If `qfmu` is installed properly, you should see a `helloWorld.fmu` file generated in your current working directory.

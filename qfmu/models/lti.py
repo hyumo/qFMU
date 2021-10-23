@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.core.fromnumeric import shape
 from .utils import convert_from_string
 
 class TransferFunction:

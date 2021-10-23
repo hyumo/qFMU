@@ -46,6 +46,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
+	rm -fr *.fmu
+	rm -fr ./tmp
 
 lint/flake8: ## check style with flake8
 	flake8 qfmu tests
@@ -77,6 +79,9 @@ servedocs: docs ## compile the docs watching for changes
 
 release: dist ## package and upload a release
 	twine upload dist/*
+
+testrelease: dist ## package and upload a release
+	twine upload --repository testpypi dist/* --verbose
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist

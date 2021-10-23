@@ -2,12 +2,12 @@
 
 from setuptools import setup, find_packages
 
-with open('README.md') as readme_file:
+with open('README.md', "r", encoding="utf-8") as readme_file:
     readme = readme_file.read()
 
-requirements = [ 'wheel==0.33.6', 'jinja2', 'numpy' ]
+requirements = [ 'numpy>=1.21', 'jinja2>=3']
 
-test_requirements = ['pytest>=3', 'wheel==0.33.6', 'jinja2', 'numpy']
+test_requirements = ['pytest>=3', 'jinja2', 'numpy']
 
 setup(
     author="Hang Yu",
@@ -32,6 +32,7 @@ setup(
     install_requires=requirements,
     license="BSD license",
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='qfmu',
     name='qfmu',
@@ -39,7 +40,9 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/hyumo/qfmu',
-    version='0.1.0',
+    version='0.1.2',
     zip_safe=False,
 )
 
+# test installation using
+# pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ qfmu

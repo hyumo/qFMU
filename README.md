@@ -9,7 +9,10 @@ Currently, `qfmu` supports:
 
 ## Installation
 
-*Noted* that a proper C compiler is required on your OS. gcc for Linux or Debian. msvc for windows (WIP).
+*Noted* that a proper C compiler is required on your OS. 
+
+- `gcc` for Linux and Debian. 
+- `msvc` for windows (WIP).
 
 Installation through PyPI
 

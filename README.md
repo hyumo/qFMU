@@ -1,7 +1,7 @@
 
 # qfmu
 
-Generate standard form system **FMUs** through CLI.
+Generate standard form system **FMUs** through CLI. `q` is for quick.
 
 Currently, `qfmu` supports:
 

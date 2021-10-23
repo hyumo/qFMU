@@ -1,5 +1,4 @@
 pip==21.3
-bump2version==0.5.11
 watchdog==0.9.0
 coverage==4.5.4
 pytest==6.2.5
@@ -8,3 +7,4 @@ numpy==1.21.2
 autopep8==1.5.7
 twine
 build
+bump2version==0.5.11

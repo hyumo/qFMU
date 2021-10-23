@@ -22,6 +22,7 @@ def main():
     ss.add_argument("-C", required=False, type=str, help="C matrix")
     ss.add_argument("-D", required=False, type=str, help="D matrix")
     ss.add_argument("-x0", required=False, type=str, help="Init state values, zero vector if empty")
+    ss.add_argument("-u0", required=False, type=str, help="Init input values, zero vector if empty")
 
     tf = subparsers.add_parser("tf", help="Transfer function (WIP)")
     tf.add_argument("-n", default="1,0", type=str, help="Numerator")
@@ -37,7 +38,8 @@ def main():
             C = None if args.C is None or args.C=="" else str_to_2d_array(args.C)
             D = None if args.D is None or args.D=="" else str_to_2d_array(args.D)
             x0 = None if args.x0 is None or args.x0=="" else str_to_1d_array(args.x0)
-            m = Lti(StateSpace(A, B, C, D, x0), identifier=args.name)
+            u0 = None if args.u0 is None or args.u0=="" else str_to_1d_array(args.u0)
+            m = Lti(StateSpace(A, B, C, D, x0, u0), identifier=args.name)
             m.buildFMU(args.dir)
         else:
             raise Exception("Unknown subcommand")

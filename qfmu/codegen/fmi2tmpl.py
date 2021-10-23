@@ -47,6 +47,7 @@ static ModelInstance instance;
 {%- endif %}
 {%- if nu > 0 %}
 #define _U   (comp->r + {{vr0.u}})
+#define _U0  (comp->r + {{vr0.u0}})
 {%- endif %}
 {%- if ny>0 %}
 #define _Y   (comp->r + {{vr0.y}})
@@ -89,6 +90,9 @@ static const fmi2Real D[{{ny}}][{{nu}}] = {
 {%- if nx > 0 %}
 static const fmi2Real x0_reset[{{nx}}] = { {{",".join(x0)}} };
 {%- endif %}
+{%- if nu > 0 %}
+static const fmi2Real u0_reset[{{nu}}] = { {{",".join(u0)}} };
+{% endif %}
 
 #ifndef max
 #define max(a,b) ((a)>(b) ? (a) : (b))
@@ -226,11 +230,15 @@ static void resetX(ModelInstance* comp){
 }
 {%- endif %}
 {%- if nu > 0 %}
+static void copyU0toU(ModelInstance* comp) {
+    memcpy(_U, _U0, NU*sizeof(fmi2Real));
+}
 /**
  * \brief ReSet input initial conditions to original values
  */
 static void resetU(ModelInstance* comp) {
-    memcpy(_U, 0, NU*sizeof(fmi2Real));
+    memcpy(_U0, u0_reset, NU*sizeof(fmi2Real));
+    copyU0toU(comp);
 }
 {%- endif %}
 
@@ -298,28 +306,33 @@ lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
   
   <ModelVariables>
     {%- for i in range(nx) %}
-    <ScalarVariable name="x{{i+1}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i+1}}">
+    <ScalarVariable name="x{{i}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i}}">
       <Real/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nx) %}
-    <ScalarVariable name="der_x{{i+1}}" valueReference="{{vrs.der[i]}}" description="State derivative {{i+1}}">
-      <Real derivative="{{i+1}}"/>
+    <ScalarVariable name="der_x{{i}}" valueReference="{{vrs.der[i]}}" description="State derivative {{i}}">
+      <Real derivative="{{ vrs.x[i] | int + 1 }}"/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nu) %}
-    <ScalarVariable name="u{{i+1}}" valueReference="{{vrs.u[i]}}" description="Model input {{i+1}}" causality="input">
+    <ScalarVariable name="u{{i}}" valueReference="{{vrs.u[i]}}" description="Model input {{i}}" causality="input">
       <Real/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(ny) %}
-    <ScalarVariable name="y{{i+1}}" valueReference="{{vrs.y[i]}}" description="Model output {{i+1}}" causality="output">
+    <ScalarVariable name="y{{i}}" valueReference="{{vrs.y[i]}}" description="Model output {{i}}" causality="output">
       <Real/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nx) %}
-    <ScalarVariable name="x{{i+1}}_start" valueReference="{{vrs.x0[i]}}" description="Start value for x{{i+1}}" causality="parameter" variability="fixed">
+    <ScalarVariable name="x{{i}}_start" valueReference="{{vrs.x0[i]}}" description="Start value for x{{i}}" causality="parameter" variability="fixed">
       <Real start="{{x0[i]}}"/>
+    </ScalarVariable>
+    {%- endfor %}
+    {%- for i in range(nu) %}
+    <ScalarVariable name="u{{i}}_start" valueReference="{{vrs.u0[i]}}" description="Start value for u{{i}}" causality="parameter" variability="fixed">
+      <Real start="{{u0[i]}}"/>
     </ScalarVariable>
     {%- endfor %}
   </ModelVariables>

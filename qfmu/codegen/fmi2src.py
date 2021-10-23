@@ -176,7 +176,7 @@ fmi2Component fmi2Instantiate(fmi2String instanceName, fmi2Type fmuType, fmi2Str
     comp->loggingOn = loggingOn;
     comp->state = modelInstantiated;
 
-    // Reset x to x0, u to 0 vector
+    // Reset x to x0, u to u0
 #if NX > 0
     resetX(comp);
     updateDerivatives(comp);
@@ -226,6 +226,9 @@ fmi2Status fmi2ExitInitializationMode(fmi2Component c) {
     if (comp->isDirtyValues) {
 #if NX > 0
         copyX0toX(comp);
+#endif
+#if NU > 0
+        copyU0toU(comp);
 #endif
 #if NX > 0
         updateDerivatives(comp);

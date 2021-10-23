@@ -42,7 +42,7 @@ optional arguments:
   --name NAME    Target FMU identifier
   --dir DIR      Target FMU path
   -v, --verbose  Verbose output
-  -n, --dry-run  Only print system information, use with -v.
+  -n, --dry-run  Only print system information without generating an FMU.
 
 System form:
   {ss}

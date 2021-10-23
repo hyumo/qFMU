@@ -31,6 +31,29 @@ Not implemented
 
 Not implemented
 
+## Development
 
+Install required packages
 
+```
+pip install -r requirements_dev.txt 
+```
 
+Dry run bumpversion
+
+```
+make patch
+```
+
+Make a test release to testpipy
+
+```
+make testrelease
+```
+
+Make a release manually (until gitaction works)
+
+```
+bumpversion major/minor/patch
+make release
+```

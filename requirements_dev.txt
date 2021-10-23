@@ -7,4 +7,5 @@ numpy==1.21.2
 autopep8==1.5.7
 twine
 build
+wheel
 bump2version==0.5.11

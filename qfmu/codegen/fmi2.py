@@ -106,7 +106,6 @@ class Lti(Fmi2):
         os.mkdir(tmpdir)
         
         # Create folder structure
-        root_dir = tmpdir
         bin_dir = os.path.join(tmpdir, "binaries")
         platform_dir = os.path.join(bin_dir, fmi_platform())
         src_dir = os.path.join(tmpdir, "sources")
@@ -118,19 +117,19 @@ class Lti(Fmi2):
 
         # Generate code
         self.generate_code(src_dir)
-        self.generate_xml(root_dir)
+        self.generate_xml(tmpdir)
         self.generate_doc(doc_dir)
 
         # Compile code
         dllpath = self.compile_dll(src_dir)
-
         # Move  to root
         shutil.move(dllpath, os.path.join(platform_dir, os.path.basename(dllpath)))
-
         # Zip files
         zippath = shutil.make_archive(os.path.join(fmudir, self.identifier), 'zip', tmpdir)
         # Rename fmu to have *.fmu
         shutil.move(zippath, os.path.join(fmudir, self.identifier+".fmu"))
+        # tmp is useless now
+        shutil.rmtree(tmpdir)
 
 
     def generate_xml(self, dir: str):

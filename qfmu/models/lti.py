@@ -80,4 +80,18 @@ class StateSpace:
         if self.u0 is not None:
             if self.nu != self.u0.size:
                 raise ValueError("Invalid vector size. len(u0) != number of inputs")
-        
+    
+    def __str__(self) -> str:
+        info = "Number of states  {}\nNumber of inputs  {}\nNumber of outputs {}\n".format(self.nx, self.nu, self.ny)
+        matrices = "A = \n{}\nB =\n{}\nC =\n{}\nD =\n{}\n".format(
+            np.array2string(self.A, precision=3),
+            np.array2string(self.B, precision=3),
+            np.array2string(self.C, precision=3),
+            np.array2string(self.D, precision=3),
+        )
+        return info + matrices
+
+if __name__ == "__main__":
+    a = np.random.random((50,50))
+    ss = StateSpace(A=a)
+    print(ss)

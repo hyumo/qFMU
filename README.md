@@ -5,11 +5,20 @@ Generate standard form system **FMUs** through CLI.
 
 Currently, `qfmu` supports:
 
-- LTI system in state space (A,B,C,D matrix) form.
+- LTI system in state space (ABCD matrices) form.
 
-## HelloWorld Example
+## Installation
 
-Run the following command to generate an LTI system in state space form. 
+*NOTED that a proper C compiler is required on your OS. gcc for Linux or Debian. msvc for windows (WIP).
+
+Installation through PyPI
+
+```
+pip install qfmu
+```
+## HelloWorld
+
+Generate an LTI system in state space form using the following command: 
 
 ```
 qfmu --name helloWorld ss -A="1,2;3,4" -B="1;2" -C="1,0;0,1" -D="[0;0]"
@@ -17,15 +26,6 @@ qfmu --name helloWorld ss -A="1,2;3,4" -B="1;2" -C="1,0;0,1" -D="[0;0]"
 
 If `qfmu` is installed properly, you should see a `helloWorld.fmu` file generated in your current working directory.
 
-## Installation
-
-(*NOTED that a proper C compiler should be installed on your OS. For Linux or Debian, gcc is required. For Windows, msvc is required. *) 
-
-Installation through PyPI
-
-```
-pip install qfmu
-```
 ## Usage
 
 ```

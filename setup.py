@@ -43,6 +43,3 @@ setup(
     version='0.1.0',
     zip_safe=False,
 )
-
-# test installation using
-# pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ qfmu

@@ -90,7 +90,7 @@ major: clean
 release: dist ## package and upload a release
 	twine upload dist/*
 
-testrelease: dist ## package and upload a release
+testrelease: dist ## package and upload a release (pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ qfmu)
 	twine upload --repository testpypi dist/* --verbose
 
 dist: clean ## builds source and wheel package

@@ -230,7 +230,7 @@ static void resetX(ModelInstance* comp){
  * \brief ReSet input initial conditions to original values
  */
 static void resetU(ModelInstance* comp) {
-    memcpy(_U, 0, NU*sizeof(fmi2Real));
+    memset(_U, 0, NU*sizeof(fmi2Real));
 }
 {%- endif %}
 
@@ -309,7 +309,7 @@ lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
     {%- endfor %}
     {%- for i in range(nu) %}
     <ScalarVariable name="u{{i+1}}" valueReference="{{vrs.u[i]}}" description="Model input {{i+1}}" causality="input">
-      <Real/>
+      <Real start="0.0"/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(ny) %}

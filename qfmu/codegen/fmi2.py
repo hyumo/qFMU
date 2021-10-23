@@ -76,7 +76,7 @@ class Lti(Fmi2):
             der=list(map(str, range(self.vr0.der, self.vr0.u))),
             u=list(map(str, range(self.vr0.u, self.vr0.y))),
             y=list(map(str, range(self.vr0.y, self.vr0.x0))),
-            x0=list(map(str, range(self.vr0.x0, self.nx))),
+            x0=list(map(str, range(self.vr0.x0, self.vr0.x0+self.nx))),
         )
 
     def render_c(self):

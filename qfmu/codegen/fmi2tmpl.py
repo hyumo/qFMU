@@ -306,32 +306,32 @@ lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
   
   <ModelVariables>
     {%- for i in range(nx) %}
-    <ScalarVariable name="x{{i}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i}}">
+    <ScalarVariable name="x{{i+1}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i+1}}">
       <Real/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nx) %}
-    <ScalarVariable name="der_x{{i}}" valueReference="{{vrs.der[i]}}" description="State derivative {{i}}">
-      <Real derivative="{{ vrs.x[i] | int + 1 }}"/>
+    <ScalarVariable name="der_x{{i+1}}" valueReference="{{vrs.der[i]}}" description="State derivative {{i+1}}">
+      <Real derivative="{{ i+1 }}"/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nu) %}
-    <ScalarVariable name="u{{i}}" valueReference="{{vrs.u[i]}}" description="Model input {{i}}" causality="input">
-      <Real/>
+    <ScalarVariable name="u{{i+1}}" valueReference="{{vrs.u[i]}}" description="Model input {{i+1}}" causality="input">
+      <Real start="{{u0[i]}}"/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(ny) %}
-    <ScalarVariable name="y{{i}}" valueReference="{{vrs.y[i]}}" description="Model output {{i}}" causality="output">
+    <ScalarVariable name="y{{i+1}}" valueReference="{{vrs.y[i]}}" description="Model output {{i+1}}" causality="output">
       <Real/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nx) %}
-    <ScalarVariable name="x{{i}}_start" valueReference="{{vrs.x0[i]}}" description="Start value for x{{i}}" causality="parameter" variability="fixed">
+    <ScalarVariable name="x{{i+1}}_start" valueReference="{{vrs.x0[i]}}" description="Start value for x{{i+1}}" causality="parameter" variability="fixed">
       <Real start="{{x0[i]}}"/>
     </ScalarVariable>
     {%- endfor %}
     {%- for i in range(nu) %}
-    <ScalarVariable name="u{{i}}_start" valueReference="{{vrs.u0[i]}}" description="Start value for u{{i}}" causality="parameter" variability="fixed">
+    <ScalarVariable name="u{{i+1}}_start" valueReference="{{vrs.u0[i]}}" description="Start value for u{{i+1}}" causality="parameter" variability="fixed">
       <Real start="{{u0[i]}}"/>
     </ScalarVariable>
     {%- endfor %}

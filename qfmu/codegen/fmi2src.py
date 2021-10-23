@@ -93,8 +93,8 @@ typedef enum {
 #define MASK_fmi2NewDiscreteStates       modelEventMode
 #define MASK_fmi2EnterContinuousTimeMode modelEventMode
 #define MASK_fmi2CompletedIntegratorStep modelContinuousTimeMode
-#define MASK_fmi2SetTime                 (modelEventMode | modelContinuousTimeMode)
-#define MASK_fmi2SetContinuousStates     modelContinuousTimeMode
+#define MASK_fmi2SetTime                 (modelInstantiated | modelEventMode | modelContinuousTimeMode)
+#define MASK_fmi2SetContinuousStates     (modelEventMode | modelContinuousTimeMode) //modelInstantiated | modelInitializationMode |
 #define MASK_fmi2GetEventIndicators      (modelInitializationMode | modelEventMode | modelContinuousTimeMode | modelTerminated | modelError)
 #define MASK_fmi2GetContinuousStates     MASK_fmi2GetEventIndicators
 #define MASK_fmi2GetDerivatives          (modelEventMode | modelContinuousTimeMode | modelTerminated | modelError)
@@ -124,6 +124,7 @@ typedef enum {
 fmi2Template_c = r'''#ifdef __cplusplus
 extern "C"
 #endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // FMI functions (common)
 ///////////////////////////////////////////////////////////////////////////////

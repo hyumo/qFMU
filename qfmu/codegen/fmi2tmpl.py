@@ -282,12 +282,17 @@ lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
     </SourceFiles>
   </ModelExchange>
 
+  <CoSimulation
+    modelIdentifier="{{identifier}}"
+    canHandleVariableCommunicationStepSize="false"
+    canNotUseMemoryManagementFunctions="false"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false">
+    <SourceFiles>
+      <File name="fmi2model.c"/>
+    </SourceFiles>
+  </CoSimulation>
 
-
-  <DefaultExperiment startTime="0.0"
-    stopTime="1.0"
-    tolerance="0.0001"/>
-  
   <LogCategories>
     <Category name="logAll"/>
     <Category name="logError"/>
@@ -295,6 +300,10 @@ lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
     <Category name="logEvent"/>
   </LogCategories>
 
+  <DefaultExperiment startTime="0.0"
+    stopTime="1.0"
+    tolerance="0.0001"/>
+  
   <ModelVariables>
     {%- for i in range(nx) %}
     <ScalarVariable name="x{{i}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i}}">

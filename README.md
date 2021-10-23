@@ -64,7 +64,7 @@ pip install -r requirements_dev.txt
 Dry run bumpversion
 
 ```
-make patch
+make major/minor/patch
 ```
 
 Make a test release to testpipy

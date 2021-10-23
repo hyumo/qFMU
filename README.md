@@ -30,6 +30,35 @@ qfmu --name helloWorld ss -A="1,2;3,4" -B="1;2" -C="1,0;0,1" -D="0;0"
 
 If `qfmu` is installed properly, you should see a `helloWorld.fmu` file generated in your current working directory.
 
+If you have `fmpy` installed, you can run `fmpy info hellowWorld.fmu` to see detailed model information.
+
+```
+Model Info
+
+  FMI Version        2.0
+  FMI Type           Model Exchange, Co-Simulation
+  Model Name         helloWorld
+  Description        None
+  Platforms          c-code, linux64
+  Continuous States  2
+  Event Indicators   0
+  Variables          10
+  Generation Tool    qfmu
+  Generation Date    2021-10-23 16:36:22.700250
+
+Default Experiment
+
+  Stop Time          1.0
+  Tolerance          0.0001
+
+Variables (input, output)
+
+  Name               Causality              Start Value  Unit     Description
+  u1                 input                          0.0           Model input 1
+  y1                 output                                       Model output 1
+  y2                 output                                       Model output 2
+```
+
 ## Usage
 
 ```

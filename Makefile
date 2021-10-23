@@ -78,7 +78,7 @@ servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 patch: clean
-	bumpversion patch --dry-run
+	bumpversion patch --dry-run --verbose
 
 release: dist ## package and upload a release
 	twine upload dist/*

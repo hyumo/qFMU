@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  fmiVersion="2.0"
+  modelName="{{identifier}}"
+  guid="{{guid}}"
+  version="{{version}}"
+  generationTool="qfmu"
+  generationDateAndTime="{{datetime}}"
+  numberOfEventIndicators="0">
+
+  <ModelExchange
+    modelIdentifier="{{identifier}}"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false"
+    providesDirectionalDerivative="false">
+    <SourceFiles>
+      <File
+        name="fmi2model.c"/>
+    </SourceFiles>
+  </ModelExchange>
+
+  <CoSimulation
+    modelIdentifier="{{identifier}}"
+    canHandleVariableCommunicationStepSize="false"
+    canNotUseMemoryManagementFunctions="false"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false">
+    <SourceFiles>
+      <File name="fmi2model.c"/>
+    </SourceFiles>
+  </CoSimulation>
+
+  <LogCategories>
+    <Category name="logAll"/>
+    <Category name="logError"/>
+    <Category name="logFmiCall"/>
+    <Category name="logEvent"/>
+  </LogCategories>
+
+  <DefaultExperiment startTime="0.0" stopTime="1.0" tolerance="0.0001"/>
+  
+  <ModelVariables>
+{% for i in range(model.nx) %}
+    <ScalarVariable name="x{{ i+1 }}" valueReference="{{ model.vr.x[i] }}" description="Continuous state {{i+1}}">
+      <Real/>
+    </ScalarVariable>
+{% endfor %}
+{% for i in range(model.nx) %}
+    <ScalarVariable name="der_x{{ i+1 }}" valueReference="{{ model.vr.der[i] }}" description="State derivative {{i+1}}">
+      <Real derivative="{{ i+1 }}"/>
+    </ScalarVariable>
+{% endfor %}
+{% for i in range(model.nu) %}
+    <ScalarVariable name="u{{i+1}}" valueReference="{{model.vr.u[i]}}" description="Model input {{i+1}}" causality="input">
+      <Real start="{{model.u0[i]}}"/>
+    </ScalarVariable>
+{% endfor %}
+{% for i in range(model.ny) %}
+    <ScalarVariable name="y{{i+1}}" valueReference="{{model.vr.y[i]}}" description="Model output {{i+1}}" causality="output">
+      <Real/>
+    </ScalarVariable>
+{% endfor %}
+{% for i in range(model.nx) %}
+    <ScalarVariable name="x{{i+1}}_start" valueReference="{{model.vr.x0[i]}}" description="Start value for x{{i+1}}" causality="parameter" variability="fixed">
+      <Real start="{{model.x0[i]}}"/>
+    </ScalarVariable>
+{% endfor %}
+{% for i in range(model.nu) %}
+    <ScalarVariable name="u{{i+1}}_start" valueReference="{{model.vr.u0[i]}}" description="Start value for u{{i+1}}" causality="parameter" variability="fixed">
+      <Real start="{{model.u0[i]}}"/>
+    </ScalarVariable>
+{% endfor %}
+  </ModelVariables>
+  
+  <ModelStructure>
+    <Outputs>
+{% for i in range(model.ny) %}
+      <Unknown index="{{model.vr0.y + i + 1}}" />
+{% endfor %}
+    </Outputs>
+    <Derivatives>
+{% for i in range(model.nx) %}
+      <Unknown index="{{model.vr0.der + i + 1}}" />
+{% endfor %}
+    </Derivatives>
+  </ModelStructure>
+</fmiModelDescription>

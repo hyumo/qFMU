@@ -1,0 +1,5 @@
+numpy
+scipy
+jinja2
+pydantic
+typer[all]

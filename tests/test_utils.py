@@ -1,47 +1,21 @@
-from qfmu.utils import str_to_1d_array, str_to_2d_array
+import sys
+
 import numpy as np
 import pytest
 
-@pytest.mark.parametrize("data,expected", [
-    ("1", np.array([1], dtype=float)),
-    ("1 ", np.array([1], dtype=float)),
-    ("  1   ", np.array([1], dtype=float)),
-    ("  1   ;", np.array([1], dtype=float)),
-    ("  1   ;   ", np.array([1], dtype=float)),
-])
-def test_str2array_1d_scalar(data,expected):
-    assert np.array_equal(str_to_1d_array(data), expected)
-
-@pytest.mark.parametrize("data,expected", [
-    ("1,2", np.array([1,2.0], dtype=float)),
-    ("1,2;", np.array([1,2.0], dtype=float)),
-    ("1 , 2", np.array([1,2.0], dtype=float)),
-    ("1 ,   2", np.array([1,2.0], dtype=float)),
-    ("1 ,   2;", np.array([1,2.0], dtype=float)),
-])
-def test_str2array_1d_comma_sep(data,expected):
-    assert np.array_equal(str_to_1d_array(data), expected)
-
-@pytest.mark.parametrize("data,expected", [
-    ("1 2", np.array([1,2.0], dtype=float)),
-    ("1 2;", np.array([1,2.0], dtype=float)),
-    ("1 2  ;  ", np.array([1,2.0], dtype=float)),
-    ("1   2", np.array([1,2.0], dtype=float)),
-    ("1 2  ", np.array([1,2.0], dtype=float)),
-    ("1    2;", np.array([1,2.0], dtype=float)),
-    ("  1 2;", np.array([1,2.0], dtype=float)),
-])
-def test_str2array_1d_space_sep(data,expected):
-    assert np.array_equal(str_to_1d_array(data), expected)
-
-@pytest.mark.parametrize("data,expected", [
-    ("1 2; 3 4", np.array([[1,2.0],[3,4]], dtype=float)),
-    ("1 2  ;   3 4", np.array([[1,2.0],[3,4]], dtype=float)),
-    ("   1    2  ;   3   4   ", np.array([[1,2.0],[3,4]], dtype=float)),
-])
-def test_str2array_2d(data,expected):
-    assert np.array_equal(str_to_2d_array(data), expected)
+from qfmu.utils import find_vcvarsall_location, str_to_arr, str_to_mat
 
 
+def test_str_to_mat():
+    assert np.array_equal(str_to_mat("[[1,2],[3,4]]"), np.array([[1, 2], [3, 4]]))
 
 
+def test_str_to_arr():
+    assert np.array_equal(str_to_arr("[1,2,3,4]"), np.array([1, 2, 3, 4]))
+
+
+@pytest.mark.skipif(
+    not sys.platform.startswith("win"), reason="This test is only for Windows"
+)
+def test_find_vcvarsall_location():
+    assert find_vcvarsall_location() is not None

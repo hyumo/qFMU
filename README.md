@@ -1,26 +1,27 @@
+<p align="center">
+  <img src="./docs/images/title.png">
+</p>
 
-# qfmu
+---
 
-Generate standard form system **FMUs** through CLI. `q` is for quick.
+**qfmu** is a python package to generate `continuous-time`, `LTI` system FMUs from command line.
 
-Currently, `qfmu` supports:
-
-- LTI system in state space (ABCD matrices) form.
+TODO: Insert ttygif here
 
 ## Installation
-
 Install `qfmu` through PyPI
 
 ```
 pip install qfmu
 ```
 
-*Noted* that a proper C compiler is required on your OS. 
+*Noted* that a C compiler is required
 
-- `gcc` for Linux and Debian. 
-- `msvc` for windows (WIP).
+- `msvc` for Windows
+- `gcc` for Linux
+- `clang` for MacOS
 
-## HelloWorld
+## Example
 
 Generate an LTI system in state space form using the following command: 
 
@@ -87,7 +88,7 @@ System form:
 Install required packages
 
 ```
-pip install -r requirements_dev.txt 
+pip install -e ".[dev]" -U
 ```
 
 Dry run bumpversion

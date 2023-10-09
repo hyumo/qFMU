@@ -1,45 +1,43 @@
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-with open('README.md', "r", encoding="utf-8") as readme_file:
-    readme = readme_file.read()
-
-requirements = [ 'numpy>=1.21', 'jinja2>=3']
-
-test_requirements = ['pytest>=3', 'jinja2', 'numpy']
+install_requires = open("requirements.txt").read().strip().split("\n")
+dev_requires = open("requirements_dev.txt").read().strip().split("\n")
 
 setup(
+    name="qfmu",
+    description="Quickly generate an FMU from command line",
     author="Hang Yu",
-    author_email='yuhang.neu@gmail.com',
-    python_requires='>=3.6',
+    author_email="yuhang.neu@gmail.com",
+    python_requires=">=3.8",
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        "Natural Language :: English",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Topic :: Software Development :: Libraries",
     ],
-    description="description",
     entry_points={
-        'console_scripts': [
-            'qfmu=qfmu.__main__:main',
+        "console_scripts": [
+            "qfmu=qfmu.__main__:app",
         ],
     },
-    install_requires=requirements,
     license="BSD license",
-    long_description=readme,
+    long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     include_package_data=True,
-    keywords='qfmu',
-    name='qfmu',
-    packages=find_packages(include=['qfmu', 'qfmu.*']),
-    test_suite='tests',
-    tests_require=test_requirements,
-    url='https://github.com/hyumo/qfmu',
-    version='0.1.4',
+    keywords="qfmu",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    test_suite="tests",
+    install_requires=install_requires,
+    extras_require={"dev": dev_requires},
+    url="https://github.com/hyumo/qfmu",
+    version="0.1.5",
     zip_safe=False,
 )

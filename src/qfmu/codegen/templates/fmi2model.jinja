@@ -1,4 +1,4 @@
-lti_c_tmpl = r'''///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // 
 //  PLEASE DO NOT MODIFY
 // 
@@ -13,10 +13,10 @@ extern "C" {
 #define MODEL_IDENTIFIER {{identifier}}
 #define MODEL_GUID "{{guid}}"
 
-#define NR {{nr}} 
-#define NX {{nx}}
-#define NU {{nu}}
-#define NY {{ny}}
+#define NR {{ model.nr }}
+#define NX {{ model.nx }}
+#define NU {{ model.nu }}
+#define NY {{ model.ny }}
 
 // macro to be used to log messages. The macro check if current 
 // log category is valid and, if true, call the logger provided by simulator.
@@ -26,7 +26,7 @@ extern "C" {
 
 typedef struct {
     ModelState state;
-    fmi2Real r[{{nr}}];
+    fmi2Real r[{{ model.nr }}];
     fmi2Real time;
     fmi2Char instanceName[256]; // TODO: change 256 by a max_str_len parameter from user argv
     fmi2Type type;
@@ -40,62 +40,53 @@ typedef struct {
 
 static const fmi2String logCategoriesNames[] = {"logAll", "logError", "logFmiCall", "logEvent"};
 static ModelInstance instance;
-{% if nx>0 %}
-#define _X   (comp->r + {{vr0.x}})
-#define _DER (comp->r + {{vr0.der}})
-#define _X0  (comp->r + {{vr0.x0}})
-{%- endif %}
-{%- if nu > 0 %}
-#define _U   (comp->r + {{vr0.u}})
-#define _U0  (comp->r + {{vr0.u0}})
-{%- endif %}
-{%- if ny>0 %}
-#define _Y   (comp->r + {{vr0.y}})
+
+{% if model.has_states() %}
+#define _X   (comp->r + {{model.vr0.x}})
+#define _DER (comp->r + {{model.vr0.der}})
+#define _X0  (comp->r + {{model.vr0.x0}})
 {% endif %}
-{%- if nx > 0 %}
-static const fmi2ValueReference vrs_x[{{nx}}] = { {{",".join(vrs.x)}} };
-static const fmi2ValueReference vrs_der[{{nx}}] = { {{",".join(vrs.der)}} };
-{%- endif %}
-{%- if ny > 0 %}
-static const fmi2ValueReference vrs_y[{{ny}}] = { {{",".join(vrs.y)}} };
+{% if model.has_inputs() %}
+#define _U   (comp->r + {{model.vr0.u}})
+#define _U0  (comp->r + {{model.vr0.u0}})
 {% endif %}
-{%- if nx > 0 %}
-static const fmi2Real A[{{nx}}][{{nx}}] = {
-    {%- for row in A %}
-    { {{row}} },
-    {%- endfor %}
-};
+{% if model.has_outputs() %}
+#define _Y   (comp->r + {{model.vr0.y}})
 {% endif %}
-{%- if nx > 0 and nu > 0 %}
-static const fmi2Real B[{{nx}}][{{nu}}] = {
-    {%- for row in B %}
-    { {{row}} },
-    {%- endfor %}
-};
-{%- endif %}
-{%- if nx > 0 and ny > 0 %}
-static const fmi2Real C[{{ny}}][{{nx}}] = {
-    {%- for row in C %}
-    { {{row}} },
-    {%- endfor %}
-};
+
+{% if model.has_states() %}
+static const fmi2ValueReference vrs_x[{{model.nx}}] = {{ model.vr.x | array2cstr }};
+static const fmi2ValueReference vrs_der[{{model.nx}}] = {{model.vr.der | array2cstr}};
 {% endif %}
-{%- if nu > 0 and ny > 0 %}
-static const fmi2Real D[{{ny}}][{{nu}}] = {
-    {%- for row in D %}
-    { {{row}} },
-    {%- endfor %}
-};
+{% if model.has_outputs() %}
+static const fmi2ValueReference vrs_y[{{model.ny}}] = {{model.vr.y | array2cstr}};
 {% endif %}
-{%- if nx > 0 %}
-static const fmi2Real x0_reset[{{nx}}] = { {{",".join(x0)}} };
-{%- endif %}
-{%- if nu > 0 %}
-static const fmi2Real u0_reset[{{nu}}] = { {{",".join(u0)}} };
+
+{% if model.has_states() %}
+static const fmi2Real A[{{model.nx}}][{{model.nx}}] = {{model.A | array2cstr}};
+{% endif %}
+{% if model.has_states() and model.has_inputs() %}
+static const fmi2Real B[{{model.nx}}][{{model.nu}}] = {{model.B | array2cstr}};
+{% endif %}
+{% if model.has_states() and model.has_outputs() %}
+static const fmi2Real C[{{model.ny}}][{{model.nx}}] = {{model.C | array2cstr}};
+{% endif %}
+{% if model.has_inputs() and model.has_outputs() %}
+static const fmi2Real D[{{model.ny}}][{{model.nu}}] = {{model.D | array2cstr}};
+{% endif %}
+{% if model.has_states() %}
+static const fmi2Real x0_reset[{{model.nx}}] = {{model.x0 | array2cstr}};
+{% endif %}
+{% if model.has_inputs() %}
+static const fmi2Real u0_reset[{{model.nu}}] = {{model.u0 | array2cstr}};
 {% endif %}
 
 #ifndef max
 #define max(a,b) ((a)>(b) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b) ((a)>(b) ? (b) : (a))
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,7 +160,7 @@ static fmi2Real innerProduct(const fmi2Real *v1, const fmi2Real *v2, const size_
     return ret;
 }
 
-{%- if nx > 0 %}
+{% if model.has_states() %}
 /**
  *  \brief Update derivative values
  */
@@ -178,28 +169,33 @@ static void updateDerivatives(ModelInstance* comp){
     for (i = 0; i < NX; i++) {
         fmi2ValueReference der_i = vrs_der[i];
         comp->r[der_i] = innerProduct(A[i], _X, NX);
-{%- if nu > 0 %}
+{% if model.has_inputs() %}
         comp->r[der_i] += innerProduct(B[i], _U, NU);
-{%- endif %}
+{% endif %}
     }
 }
-{%- endif %}
-{%- if nx > 0 %}
+
 /**
  *  \brief Update states values using numerical integration
  *  \todo TODO: Implement other integration methods
  */
 static void updateStates(ModelInstance* comp, fmi2Real h){
+    const fmi2Real dt = {{ dt }};
     size_t i = 0;
     for (i = 0; i < NX; i++) {
+        fmi2Real hc = h;
         fmi2ValueReference x_i = vrs_x[i];
         fmi2ValueReference der_i = vrs_der[i];
         // Update states using forward Euler
-        comp->r[x_i] += h * comp->r[der_i];
+        while(hc > 0) {
+            comp->r[x_i] += min(dt, hc) * comp->r[der_i];
+            hc -= dt;
+        }
     }
 }
-{%- endif %}
-{%- if ny > 0 %}
+{% endif %}
+
+{% if model.has_outputs() %}
 /**
  * \brief Update output values based on current state
  */
@@ -208,19 +204,21 @@ static void updateOutputs(ModelInstance* comp) {
     for (i = 0; i < NY; i++){
         fmi2ValueReference y_i = vrs_y[i];
         r(y_i) = 0;
-{%- if nx > 0 %}
+{% if model.has_states() %}
         r(y_i) += innerProduct(C[i], _X, NX);
-{%- endif %}
-{%- if nu > 0 %}
+{% endif %}
+{% if model.has_inputs() %}
         r(y_i) += innerProduct(D[i], _U, NU);
-{%- endif %}
+{% endif %}
     }
 }
-{%- endif %}
-{%- if nx > 0 %}
+{% endif %}
+
+{% if model.has_states() %}
 static void copyX0toX(ModelInstance* comp){
     memcpy(_X, _X0, NX*sizeof(fmi2Real));
 }
+
 /**
  * \brief ReSet state initial conditions to original values
  */
@@ -228,11 +226,13 @@ static void resetX(ModelInstance* comp){
     memcpy(_X0, x0_reset, NX*sizeof(fmi2Real));
     copyX0toX(comp);
 }
-{%- endif %}
-{%- if nu > 0 %}
+{% endif %}
+
+{% if model.has_inputs() %}
 static void copyU0toU(ModelInstance* comp) {
     memcpy(_U, _U0, NU*sizeof(fmi2Real));
 }
+
 /**
  * \brief ReSet input initial conditions to original values
  */
@@ -240,114 +240,19 @@ static void resetU(ModelInstance* comp) {
     memcpy(_U0, u0_reset, NU*sizeof(fmi2Real));
     copyU0toU(comp);
 }
-{%- endif %}
-
+{% endif %}
 
 static void evaluate(ModelInstance* comp){
-{%- if nx > 0 %}
+{% if model.has_states() %}
     updateDerivatives(comp);
-{%- endif %}
-{%- if ny > 0 %}
+{% endif %}
+{% if model.has_outputs() %}
     updateOutputs(comp);
-{%- endif %}
+{% endif %}
 }
-
 
 #include "fmi2Template.c"
 
 #ifdef __cplusplus
 }
 #endif
-'''
-
-lti_md_xml_tmpl = r'''<?xml version="1.0" encoding="UTF-8"?>
-<fmiModelDescription
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  fmiVersion="2.0"
-  modelName="{{identifier}}"
-  guid="{{guid}}"
-  version="{{version}}"
-  generationTool="qfmu"
-  generationDateAndTime="{{datetime}}"
-  numberOfEventIndicators="0">
-
-  <ModelExchange
-    modelIdentifier="{{identifier}}"
-    canGetAndSetFMUstate="false"
-    canSerializeFMUstate="false"
-    providesDirectionalDerivative="false">
-    <SourceFiles>
-      <File
-        name="fmi2model.c"/>
-    </SourceFiles>
-  </ModelExchange>
-
-  <CoSimulation
-    modelIdentifier="{{identifier}}"
-    canHandleVariableCommunicationStepSize="false"
-    canNotUseMemoryManagementFunctions="false"
-    canGetAndSetFMUstate="false"
-    canSerializeFMUstate="false">
-    <SourceFiles>
-      <File name="fmi2model.c"/>
-    </SourceFiles>
-  </CoSimulation>
-
-  <LogCategories>
-    <Category name="logAll"/>
-    <Category name="logError"/>
-    <Category name="logFmiCall"/>
-    <Category name="logEvent"/>
-  </LogCategories>
-
-  <DefaultExperiment startTime="0.0"
-    stopTime="1.0"
-    tolerance="0.0001"/>
-  
-  <ModelVariables>
-    {%- for i in range(nx) %}
-    <ScalarVariable name="x{{i+1}}" valueReference="{{vrs.x[i]}}" description="Continuous state {{i+1}}">
-      <Real/>
-    </ScalarVariable>
-    {%- endfor %}
-    {%- for i in range(nx) %}
-    <ScalarVariable name="der_x{{i+1}}" valueReference="{{vrs.der[i]}}" description="State derivative {{i+1}}">
-      <Real derivative="{{ i+1 }}"/>
-    </ScalarVariable>
-    {%- endfor %}
-    {%- for i in range(nu) %}
-    <ScalarVariable name="u{{i+1}}" valueReference="{{vrs.u[i]}}" description="Model input {{i+1}}" causality="input">
-      <Real start="{{u0[i]}}"/>
-    </ScalarVariable>
-    {%- endfor %}
-    {%- for i in range(ny) %}
-    <ScalarVariable name="y{{i+1}}" valueReference="{{vrs.y[i]}}" description="Model output {{i+1}}" causality="output">
-      <Real/>
-    </ScalarVariable>
-    {%- endfor %}
-    {%- for i in range(nx) %}
-    <ScalarVariable name="x{{i+1}}_start" valueReference="{{vrs.x0[i]}}" description="Start value for x{{i+1}}" causality="parameter" variability="fixed">
-      <Real start="{{x0[i]}}"/>
-    </ScalarVariable>
-    {%- endfor %}
-    {%- for i in range(nu) %}
-    <ScalarVariable name="u{{i+1}}_start" valueReference="{{vrs.u0[i]}}" description="Start value for u{{i+1}}" causality="parameter" variability="fixed">
-      <Real start="{{u0[i]}}"/>
-    </ScalarVariable>
-    {%- endfor %}
-  </ModelVariables>
-  
-  <ModelStructure>
-    <Outputs>
-    {%- for i in range(ny) %}
-      <Unknown index="{{vr0.y + i + 1}}" />
-    {%- endfor %}
-    </Outputs>
-    <Derivatives>
-    {%- for i in range(nx) %}
-      <Unknown index="{{vr0.der + i + 1}}" />
-    {%- endfor %}
-    </Derivatives>
-  </ModelStructure>
-</fmiModelDescription>
-'''

@@ -4,7 +4,7 @@ import sys
 
 __author__ = """Hang Yu"""
 __email__ = "yuhang.neu@gmail.com"
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 __module_path__ = pathlib.Path(__file__).parent
 __template_path__ = __module_path__ / "codegen" / "templates"

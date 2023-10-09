@@ -31,7 +31,6 @@ class PID(LTI):
             signal.TransferFunction([kd, 0.0], [T, 1.0]) if has_D else None
         )
 
-        logging.info([has_P, has_I, has_D])
         if sum([has_P, has_I, has_D]) == 0:
             raise ValueError("At least one of kp, ki, kd must be non-zero")
         elif sum([has_P, has_I, has_D]) == 1:

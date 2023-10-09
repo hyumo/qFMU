@@ -34,6 +34,7 @@ setup(
     keywords="qfmu",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
+    package_data={"qfmu": ["codegen/templates/*", "codegen/include/*"]},
     test_suite="tests",
     install_requires=install_requires,
     extras_require={"dev": dev_requires},

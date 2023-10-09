@@ -12,12 +12,12 @@ import uuid
 import numpy as np
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from qfmu import __include_path__, __platform__, __version__
+from qfmu import __include_path__, __platform__, __version__, __template_path__
 from qfmu.codegen.utils import array2cstr
 from qfmu.model.lti import LTI
 
 env = Environment(
-    loader=FileSystemLoader("src/qfmu/codegen/templates"),
+    loader=FileSystemLoader(__template_path__),
     autoescape=select_autoescape(),
     trim_blocks=True,
 )

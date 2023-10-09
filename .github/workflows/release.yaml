@@ -1,4 +1,4 @@
-name: qfmu_ci
+name: release
 
 on:
   workflow_dispatch:

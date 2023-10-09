@@ -6,7 +6,7 @@
 
 **qfmu** is a python package to generate `continuous-time`, `LTI` system FMUs from command line.
 
-TODO: Insert ttygif here
+![](./docs/images/demo.gif)
 
 ## Installation
 Install `qfmu` through PyPI
@@ -21,31 +21,45 @@ pip install qfmu
 - `gcc` for Linux
 - `clang` for MacOS
 
-## Example
+## Features
 
-Generate an LTI system in state space form using the following command: 
+Currently, qfmu is able to generate fmus that are compliant with **FMI2** standard. 
 
+The following models are supported:
+
+| Model              	| ME 	| CS 	|
+|--------------------	|----	|----	|
+| State Space       	| ✔️  | ✔️ 	|
+| Transfer Function 	| ✔️  | ✔️ 	|
+| PID               	| ✔️  | ✔️ 	|
+
+*Noted* that only continuous-time models are supported currently.
+
+## Examples
+
+Generate a continuous-time state space FMU
+
+```bash
+qfmu ss -A "[[1,2],[3,4]]" -B "[[1],[2]]" -C "[[1,0],[0,1]]" -x0 "[3.14, 6]" -o ./q.fmu
 ```
-qfmu --name helloWorld ss -A="1,2;3,4" -B="1;2" -C="1,0;0,1" -D="0;0"
-```
 
-If `qfmu` is installed properly, you should see a `helloWorld.fmu` file generated in your current working directory.
+If `qfmu` is installed properly, you should see a `q.fmu` file generated in your current working directory.
 
-If you have `fmpy` installed, you can run `fmpy info hellowWorld.fmu` to see detailed model information.
+If you have `fmpy` installed, you can run `fmpy info q.fmu` to see detailed model information.
 
 ```
 Model Info
 
   FMI Version        2.0
   FMI Type           Model Exchange, Co-Simulation
-  Model Name         helloWorld
+  Model Name         q
   Description        None
   Platforms          c-code, linux64
   Continuous States  2
   Event Indicators   0
   Variables          10
   Generation Tool    qfmu
-  Generation Date    2021-10-23 16:36:22.700250
+  Generation Date    2023-10-08 21:24:32.733857
 
 Default Experiment
 
@@ -60,58 +74,14 @@ Variables (input, output)
   y2                 output                                       Model output 2
 ```
 
-## Usage
+Generate a continuous-time transfer function FMU
 
-```
-usage: qfmu [-h] [--name NAME] [--dir DIR] [-v] [-n] {ss} ...
-
-Generate standard form system FMUs through commandline
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --name NAME    Target FMU identifier
-  --dir DIR      Target FMU path
-  -v, --verbose  Verbose output
-  -n, --dry-run  Only print system information without generating an FMU.
-
-System form:
-  {ss}
-    ss           State space model: A, B, C, D
+```bash
+qfmu tf --num "[1]" --den "[1,1]" -o ./q.fmu
 ```
 
-## Knwon issues
+Generate a continuous-time PID controller FMU
 
-- No Windows support yet (WIP)
-
-## For developers
-
-Install required packages
-
+```bash
+qfmu pid --kp=3.0 --ki=1 -o ./q.fmu
 ```
-pip install -e ".[dev]" -U
-```
-
-Dry run bumpversion
-
-```
-make major/minor/patch
-```
-
-Make a test release to testpipy
-
-```
-make testrelease
-```
-
-Make a release manually (until gitaction works)
-
-```
-bumpversion major/minor/patch
-make release
-```
-
-## Acknowledgement
-- [fmusdk](https://github.com/qtronic/fmusdk)
-- [fmpy](https://github.com/CATIA-Systems/FMPy)
-
-`qfmu`'s code template is modified based on `fmusdk`. Some functions of `qfmu` is borrowed from fmpy.

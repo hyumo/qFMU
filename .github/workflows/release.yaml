@@ -41,13 +41,7 @@ jobs:
       
       - name: Test with Pytest
         run: |
-          pytest --cov --cov-report xml:codecov.xml
-
-      - name: Code coverage
-        uses: orgoro/coverage@v3.1
-        with:
-            coverageFile: codecov.xml
-            token: ${{ secrets.GITHUB_TOKEN }}
+          pytest .
 
   deploy:
     needs: build

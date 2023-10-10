@@ -12,3 +12,4 @@ build
 wheel
 bump2version
 mypy
+pipreqs

@@ -21,8 +21,8 @@ class TransferFunction(LTI):
             nx=self._A.shape[0],
             nu=1,
             ny=1,
-            x0=x0 if x0 is not None else np.zeros(self._A.shape[0]),
-            u0=u0 if u0 is not None else np.zeros(1),
+            x0=np.array([x0]) if x0 is not None else np.zeros(self._A.shape[0]),
+            u0=np.array([u0]) if u0 is not None else np.zeros(1),
         )
 
         logging.info(f"{signal.TransferFunction(num, den)}")

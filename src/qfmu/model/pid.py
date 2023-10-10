@@ -55,8 +55,8 @@ class PID(LTI):
             self.m.A.shape[0],
             1,
             1,
-            [x0] if x0 is not None else None,
-            [u0] if u0 is not None else None,
+            np.array([x0]) if x0 is not None else None,
+            np.array([u0]) if u0 is not None else None,
         )
 
         logging.info(f"P = {P}")

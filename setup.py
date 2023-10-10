@@ -39,6 +39,6 @@ setup(
     install_requires=install_requires,
     extras_require={"dev": dev_requires},
     url="https://github.com/hyumo/qfmu",
-    version="0.2.4",
+    version="0.2.5",
     zip_safe=False,
 )

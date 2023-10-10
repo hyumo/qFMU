@@ -119,7 +119,7 @@ def build_fmu(
     dt: float = 0.001,
 ) -> None:
     _guid = str(uuid.uuid1())
-    _datetime = str(datetime.datetime.now())
+    _datetime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
     # TODO: Support fmi3 by loading different templates
     fmu_model_tmpl = env.get_template("fmi2model.jinja")

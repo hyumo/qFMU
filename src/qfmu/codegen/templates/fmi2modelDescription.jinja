@@ -84,5 +84,16 @@
       <Unknown index="{{model.vr0.der + i + 1}}" />
 {% endfor %}
     </Derivatives>
+    <InitialUnknowns>
+{% for i in range(model.nx) %}
+      <Unknown index="{{model.vr0.x + i + 1}}" />
+{% endfor %}
+{% for i in range(model.nx) %}
+      <Unknown index="{{model.vr0.der + i + 1}}" />
+{% endfor %}
+{% for i in range(model.ny) %}
+      <Unknown index="{{model.vr0.y + i + 1}}" />
+{% endfor %}
+    </InitialUnknowns>
   </ModelStructure>
 </fmiModelDescription>

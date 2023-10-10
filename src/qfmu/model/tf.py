@@ -17,7 +17,13 @@ class TransferFunction(LTI):
         u0: Optional[float] = None,
     ):
         self._A, self._B, self._C, self._D = signal.tf2ss(num, den)
-        super().__init__(nx=self._A.shape[0], nu=1, ny=1, x0=x0, u0=u0)
+        super().__init__(
+            nx=self._A.shape[0],
+            nu=1,
+            ny=1,
+            x0=x0 if x0 is not None else np.zeros(self._A.shape[0]),
+            u0=u0 if u0 is not None else np.zeros(1),
+        )
 
         logging.info(f"{signal.TransferFunction(num, den)}")
 

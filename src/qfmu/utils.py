@@ -95,7 +95,7 @@ def compile_dll(src_dir: pathlib.Path, identifier: str) -> pathlib.Path:
         cmd += f" && gcc -static-libgcc -shared -o{target} *.o -lm"
     elif "darwin" in __platform__:
         target = identifier + ".dylib"
-        cmd = "clang -c -arch x86_64 -arch arm64 -I ./include fmi2model.c"
+        cmd = "clang -c -arch x86_64 -arch arm64 -I ./include -DDISABLE_PREFIX fmi2model.c"  # noqa: E501
         cmd += f" && clang -shared -arch x86_64 -arch arm64 -o{target} *.o -lm"
     else:
         raise RuntimeError("Unknown compiler")
@@ -119,7 +119,7 @@ def build_fmu(
     dt: float = 0.001,
 ) -> None:
     _guid = str(uuid.uuid1())
-    _datetime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+    _datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
 
     # TODO: Support fmi3 by loading different templates
     fmu_model_tmpl = env.get_template("fmi2model.jinja")

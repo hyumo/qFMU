@@ -13,3 +13,5 @@ wheel
 bump2version
 mypy
 pipreqs
+pandas
+fmpy==0.3.16

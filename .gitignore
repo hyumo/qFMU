@@ -1,6 +1,8 @@
 .tmp/
 .ruff_cache/
 *.fmu
+!examples/**/*.fmu
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

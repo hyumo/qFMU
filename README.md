@@ -35,15 +35,20 @@ The following models are supported:
 
 *Noted* that only continuous-time models are supported currently.
 
+## Usage
+
 ## Examples
 
-Generate a continuous-time state space FMU
+Generate a continuous-time state space FMU. 
 
 ```bash
 qfmu ss -A "[[1,2],[3,4]]" -B "[[1],[2]]" -C "[[1,0],[0,1]]" -x0 "[3.14, 6]" -o ./q.fmu
 ```
 
 If `qfmu` is installed properly, you should see a `q.fmu` file generated in your current working directory.
+
+- `A`, `B`, `C` matrices are provided as `JSON` strings
+- `D` matrix is automatically inferred as a `zero` matrix with the correct size.  
 
 If you have `fmpy` installed, you can run `fmpy info q.fmu` to see detailed model information.
 

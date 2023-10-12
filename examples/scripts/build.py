@@ -122,6 +122,15 @@ def build_ss(
         df[f"u{i+1}"].iloc[df.index > len(df) / 5] = 1.0
     df.to_csv(in_csv_filename, index=False)
 
+    # Validate
+    ret = subprocess.run([
+        "fmpy",
+        "validate",
+        str(fmu_filename),
+    ]).returncode
+    if ret != 0:
+        raise Exception("Validation failed")
+
     # Simulate
     sim_cmd = [
         "fmpy",

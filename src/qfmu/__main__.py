@@ -129,6 +129,44 @@ def tf(
 
 
 @app.command()
+def zpk(
+    z: str = typer.Option(..., "--zeros", "-z", help="Transfer function Zeros"),
+    p: str = typer.Option(..., "--poles", "-p", help="Transfer function Poles"),
+    k: Optional[float] = typer.Option(1.0, "--k", "-k", help="Transfer function gain"),
+    x0: Optional[float] = typer.Option(
+        None, "--x0", "-x0", help="Initial state value. Zero if empty"
+    ),
+    u0: Optional[float] = typer.Option(
+        None, "--u0", "-u0", help="Initial input value. Zero if empty"
+    ),
+    dt: float = typer.Option(
+        0.001, "--dt", "-h", help="Euler integrator step size", min=0.0
+    ),
+    output: pathlib.Path = typer.Option(
+        "./q.fmu",
+        "--output",
+        "-o",
+        help="FMU Output path",
+        writable=True,
+        file_okay=True,
+        dir_okay=False,
+        resolve_path=True,
+    ),
+):
+    """Generate a continuous-time transfer function fmu using zeros, poles and gain (zpk) representation"""
+    # Get filename as identifier
+    if output.suffix != ".fmu":
+        raise ValueError("Output file must be an FMU")
+    identifier = output.stem
+
+    # Construct a state space model
+    m = model.ZerosPolesGain(str_to_arr(z), str_to_arr(p), k, x0, u0)
+
+    # Build FMU
+    build_fmu(m, output, identifier=identifier, dt=dt)
+
+
+@app.command()
 def pid(
     kp: float = typer.Option(0.0, "--kp", help="Proportional gain"),
     ki: float = typer.Option(0.0, "--ki", help="Integral gain"),

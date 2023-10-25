@@ -27,30 +27,26 @@ Currently, qfmu is able to generate fmus that are compliant with **FMI2** standa
 
 The following models are supported:
 
-| Model              	| ME 	| CS 	|
-|--------------------	|----	|----	|
-| State Space       	| ✔️  | ✔️ 	|
-| Transfer Function 	| ✔️  | ✔️ 	|
-| PID               	| ✔️  | ✔️ 	|
+| Model              	     | ME  | CS  |
+|--------------------------|-----|-----|
+| State Space (`ss`)   	   | ✔️  | ✔️ |
+| Transfer Function (`tf`) | ✔️  | ✔️ |
+| ZeroPoleGain (`zpk`)     | ✔️  | ✔️ |
+| PID (`pid`)        	     | ✔️  | ✔️ |
 
 *Noted* that only continuous-time models are supported currently.
 
-## Usage
-
 ## Examples
 
-Generate a continuous-time state space FMU. 
+Generate a continuous-time state space FMU
 
 ```bash
-qfmu ss -A "[[1,2],[3,4]]" -B "[[1],[2]]" -C "[[1,0],[0,1]]" -x0 "[3.14, 6]" -o ./q.fmu
+qfmu ss -A "[[1,2],[3,4]]" -B "[[1],[2]]" -C "[[1,0],[0,1]]" -x0 "[3.14, 6]" -o ./example_ss.fmu
 ```
 
-If `qfmu` is installed properly, you should see a `q.fmu` file generated in your current working directory.
+If `qfmu` is installed properly, you should see a `example_ss.fmu` file generated in your current working directory.
 
-- `A`, `B`, `C` matrices are provided as `JSON` strings
-- `D` matrix is automatically inferred as a `zero` matrix with the correct size.  
-
-If you have `fmpy` installed, you can run `fmpy info q.fmu` to see detailed model information.
+If you have `fmpy` installed, you can run `fmpy info example_ss.fmu` to see detailed model information.
 
 ```
 Model Info
@@ -79,14 +75,20 @@ Variables (input, output)
   y2                 output                                       Model output 2
 ```
 
-Generate a continuous-time transfer function FMU
+Generate a continuous-time transfer function FMU using the `numerator`, `denominator` representation: $\frac{s}{s+1}$
 
 ```bash
-qfmu tf --num "[1]" --den "[1,1]" -o ./q.fmu
+qfmu tf --num "[1]" --den "[1,1]" -o ./example_tf.fmu
 ```
 
-Generate a continuous-time PID controller FMU
+Generate a continuous-time transfer function FMU using the `zero-pole-gain` representation: $\frac{0.5(s-1)}{(s+1)(s+2)}$
 
 ```bash
-qfmu pid --kp=3.0 --ki=1 -o ./q.fmu
+qfmu zpk -z "[1]" -p "[-1, -2]" -k 0.5 -o ./example_zpk.fmu
+```
+
+Generate a continuous-time PI controller FMU: $3 + \frac{0.1}{s}$
+
+```bash
+qfmu pid --kp=3.0 --ki=0.1 -o ./example_pid.fmu
 ```

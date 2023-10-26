@@ -24,7 +24,7 @@ class StateSpace(LTI):
         State space system constructor
         """
         if all([A is None, B is None, C is None, D is None]):
-            raise ValueError("A, B, C, D matrices cannot all be None")
+            raise ValueError("A, B, C, D matrices cannot be all None")
         elif all([A is not None, C is None, B is None, D is None]):
             C = np.eye(A.shape[0])
             B = np.zeros((A.shape[0], 0))

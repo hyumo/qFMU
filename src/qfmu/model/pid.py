@@ -15,14 +15,14 @@ class PID(LTI):
         ki: float = 0.0,
         kd: float = 0.0,
         T: float = 0.0,
-        x0: Optional[float] = None,
+        x0: Optional[np.ndarray] = None,
         u0: Optional[float] = None,
     ) -> None:
         has_P = not math.isclose(kp, 0.0)
         has_I = not math.isclose(ki, 0.0)
         has_D = not math.isclose(kd, 0.0)
 
-        if math.isclose(T, 0.0) and has_D:
+        if has_D and math.isclose(T, 0.0) or T < 0.0:
             raise ValueError("T must be greater than zero")
 
         P = signal.TransferFunction([kp], [1.0]) if has_P else None  # noqa: E741
@@ -55,8 +55,8 @@ class PID(LTI):
             self.m.A.shape[0],
             1,
             1,
-            np.array([x0]) if x0 is not None else None,
-            np.array([u0]) if u0 is not None else None,
+            x0 if x0 is not None else np.zeros(self.m.A.shape[0]),
+            np.array([u0]) if u0 is not None else np.zeros(1),
         )
 
         logging.info(f"P = {P}")

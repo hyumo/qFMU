@@ -14,7 +14,7 @@ class ZerosPolesGain(LTI):
         z: npt.NDArray[np.float64],
         p: npt.NDArray[np.float64],
         k: float,
-        x0: Optional[float] = None,
+        x0: Optional[npt.NDArray[np.float64]] = None,
         u0: Optional[float] = None,
     ):
         self._A, self._B, self._C, self._D = signal.zpk2ss(z=z, p=p, k=k)
@@ -22,7 +22,7 @@ class ZerosPolesGain(LTI):
             nx=self._A.shape[0],
             nu=1,
             ny=1,
-            x0=np.array([x0]) if x0 is not None else np.zeros(self._A.shape[0]),
+            x0=np.array(x0) if x0 is not None else np.zeros(self._A.shape[0]),
             u0=np.array([u0]) if u0 is not None else np.zeros(1),
         )
 

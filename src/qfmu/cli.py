@@ -137,7 +137,7 @@ def ss(
     "-x0",
     type=str,
     default=None,
-    help="Initial state vector as a json list of floats. `zero` vector with inferred size if empty",
+    help="Initial state vector as a json list of floats. `zero` vector with inferred size if empty",    # noqa: E501
 )
 @click.option(
     "--u0",
@@ -257,7 +257,7 @@ def zpk(
     dt: float,
     output: pathlib.Path,
 ):
-    """Generate a continuous-time transfer function fmu using zeros, poles and gain (zpk) representation"""
+    """Generate a continuous-time transfer function fmu using zeros, poles and gain (zpk) representation""" # noqa: E501
     # Get filename as identifier
     if output.suffix != ".fmu":
         raise ValueError("Output file must be an FMU")

@@ -8,9 +8,11 @@ from click.testing import CliRunner
 from qfmu.cli import cli
 from qfmu.model.pid import PID
 
-any_float = lambda: uniform(-100, 100)
-any_pos_float = lambda: uniform(0, 100)
+def any_float():
+    return uniform(-100, 100)
 
+def any_pos_float():
+    return uniform(0, 100)
 
 @pytest.mark.parametrize(
     "kp, ki, kd, tf, nx, nu, ny",
@@ -104,25 +106,25 @@ def test_cli_pid(kp, ki, kd, T, x0, u0, tmp_path):
 )
 def test_cli_pid_error(kp, ki, kd, T, x0, u0, tmp_path):
     runner = CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        result = runner.invoke(
-            cli,
-            [
-                "pid",
-                "--kp",
-                f"{kp}",
-                "--ki",
-                f"{ki}",
-                "--kd",
-                f"{kd}",
-                "--T",
-                f"{T}",
-                "--dt",
-                "0.001",
-                "--output",
-                "q.fmu",
-            ]
-            + (["--x0", f"{x0}"] if x0 is not None else [])
-            + (["--u0", f"{u0}"] if u0 is not None else []),
-        )
-        assert result.exit_code != 0
+    result = runner.invoke(
+        cli,
+        [
+            "pid",
+            "--kp",
+            f"{kp}",
+            "--ki",
+            f"{ki}",
+            "--kd",
+            f"{kd}",
+            "--T",
+            f"{T}",
+            "--dt",
+            "0.001",
+            "--output",
+            "q.fmu",
+        ]
+        + (["--x0", f"{x0}"] if x0 is not None else [])
+        + (["--u0", f"{u0}"] if u0 is not None else []),
+    )
+    assert result.exit_code != 0
+

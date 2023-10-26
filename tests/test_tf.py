@@ -8,7 +8,6 @@ import pytest
 from click.testing import CliRunner
 
 from qfmu.cli import cli
-from qfmu.model.tf import TransferFunction
 
 class TestTransferFunction:
 

@@ -123,11 +123,13 @@ def build_ss(
     df.to_csv(in_csv_filename, index=False)
 
     # Validate
-    ret = subprocess.run([
-        "fmpy",
-        "validate",
-        str(fmu_filename),
-    ]).returncode
+    ret = subprocess.run(
+        [
+            "fmpy",
+            "validate",
+            str(fmu_filename),
+        ]
+    ).returncode
     if ret != 0:
         raise Exception("Validation failed")
 

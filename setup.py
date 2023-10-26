@@ -24,7 +24,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "qfmu=qfmu.__main__:app",
+            "qfmu=qfmu.cli:cli",
         ],
     },
     license="BSD license",
@@ -39,6 +39,6 @@ setup(
     install_requires=install_requires,
     extras_require={"dev": dev_requires},
     url="https://github.com/hyumo/qfmu",
-    version="0.2.8",
+    version="0.2.9",
     zip_safe=False,
 )
